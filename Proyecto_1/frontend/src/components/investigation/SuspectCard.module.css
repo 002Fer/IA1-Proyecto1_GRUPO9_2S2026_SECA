@@ -1,0 +1,58 @@
+﻿.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  transition: all 0.2s;
+}
+.card:hover { border-color: var(--primary); }
+.top { display: flex; align-items: center; gap: 0.8rem; }
+.avatar {
+  width: 46px; height: 46px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.info { flex: 1; }
+.name { font-weight: 700; font-size: 1rem; margin: 0; }
+.role { font-size: 0.78rem; color: var(--text-muted); }
+.suspLevel { font-size: 1.3rem; font-weight: 700; }
+.bar { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.barFill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+.badges { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.badge {
+  font-size: 0.72rem; padding: 0.2rem 0.5rem;
+  border-radius: 20px; font-weight: 600;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+}
+.valid { background: rgba(76,175,80,0.15); color: #4caf50; border-color: rgba(76,175,80,0.3); }
+.invalid { background: rgba(244,67,54,0.15); color: #f44336; border-color: rgba(244,67,54,0.3); }
+.desc { font-size: 0.85rem; color: var(--text-muted); }
+.actions { display: flex; gap: 0.5rem; }
+.btnInterrogate {
+  background: rgba(70,130,240,0.15);
+  color: var(--primary);
+  border: 1px solid rgba(70,130,240,0.3);
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btnInterrogate:hover { background: var(--primary); color: #fff; }
+.testimony {
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+  font-size: 0.85rem;
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+.testimony ul { margin: 0.5rem 0 0.8rem 1rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.testimony li { color: var(--text-muted); font-style: italic; }
+.detail { display: flex; flex-direction: column; gap: 0.3rem; }
+.detail span { font-size: 0.82rem; }

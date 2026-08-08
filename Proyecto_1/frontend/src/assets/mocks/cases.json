@@ -1,0 +1,345 @@
+﻿[
+  {
+    "id": "caso-1",
+    "title": "Asesinato en el Museo",
+    "description": "Una valiosa pintura del siglo XVIII ha desaparecido del Museo Nacional de Arte durante la noche. El guardia nocturno fue encontrado inconsciente. Cuatro personas tenian acceso al museo esa noche.",
+    "difficulty": "Facil",
+    "status": "disponible",
+    "culprit": "suspect-2",
+    "suspects": [
+      {
+        "id": "suspect-1",
+        "name": "Marco Villanueva",
+        "age": 45,
+        "role": "Director del Museo",
+        "description": "Director del museo desde hace 10 anos. Conoce cada rincon del edificio.",
+        "alibi": "Afirma haber estado en una cena oficial hasta las 23:00",
+        "alibiValid": true,
+        "motive": "Deudas economicas por mal manejo de fondos",
+        "means": "Tiene llaves maestras de todo el museo",
+        "suspicionLevel": 45,
+        "statements": [
+          "Estaba en la cena del alcalde hasta las 23:00, hay testigos.",
+          "La pintura fue revisada a las 18:00 y estaba en perfectas condiciones.",
+          "No conozco a ningun coleccionista que pagaria por esa obra."
+        ]
+      },
+      {
+        "id": "suspect-2",
+        "name": "Elena Rios",
+        "age": 32,
+        "role": "Restauradora de Arte",
+        "description": "Experta en restauracion. Tuvo acceso a la pintura dos semanas antes del robo.",
+        "alibi": "Dice haber trabajado hasta tarde en su taller privado",
+        "alibiValid": false,
+        "motive": "Contactos con coleccionistas privados en el mercado negro",
+        "means": "Conoce el sistema de alarmas del museo",
+        "suspicionLevel": 85,
+        "statements": [
+          "Trabaje en mi taller toda la noche, pero estaba sola.",
+          "Esa pintura tenia un defecto oculto que solo yo conozco.",
+          "No tengo ninguna razon para robarla."
+        ]
+      },
+      {
+        "id": "suspect-3",
+        "name": "Roberto Peña",
+        "age": 28,
+        "role": "Guardia de Seguridad",
+        "description": "Guardia nocturno. Fue encontrado inconsciente junto a la sala principal.",
+        "alibi": "Fue drogado segun informe medico",
+        "alibiValid": true,
+        "motive": "Ninguno identificado",
+        "means": "Acceso a camaras de seguridad",
+        "suspicionLevel": 15,
+        "statements": [
+          "Lo ultimo que recuerdo es haber tomado mi cafe de las 22:00.",
+          "Vi a alguien con abrigo oscuro cerca de la sala 3 antes de desmayarme.",
+          "Nunca dejaria que robaran el museo."
+        ]
+      },
+      {
+        "id": "suspect-4",
+        "name": "Carmen Lozano",
+        "age": 55,
+        "role": "Curadora Principal",
+        "description": "Curadora con 25 anos de experiencia. Tenia conflictos con la direccion.",
+        "alibi": "Afirma haber estado enferma en casa",
+        "alibiValid": false,
+        "motive": "Venganza contra el director por no renovar su contrato",
+        "means": "Conoce el valor exacto de cada pieza y los horarios del personal",
+        "suspicionLevel": 60,
+        "statements": [
+          "Estaba enferma, mi medico puede confirmarlo... aunque no lo llame esa noche.",
+          "Esa pintura vale 3 millones. Cualquiera con contactos la venderia.",
+          "Marco siempre ha sido corrupto. Quizas el mismo la robo."
+        ]
+      }
+    ],
+    "evidence": [
+      { "id": "ev-1", "type": "Fisica", "description": "Huellas dactilares parciales en el marco vacio", "location": "Sala 3 - Galeria Principal", "relatedSuspects": ["suspect-2"] },
+      { "id": "ev-2", "type": "Quimica", "description": "Residuos de somnifero en la taza de cafe del guardia", "location": "Sala de descanso", "relatedSuspects": ["suspect-2", "suspect-4"] },
+      { "id": "ev-3", "type": "Digital", "description": "Camara de seguridad desactivada entre 22:15 y 23:45", "location": "Sistema central", "relatedSuspects": ["suspect-2"] },
+      { "id": "ev-4", "type": "Testimonial", "description": "Testigo vio un vehiculo desconocido frente al museo a las 23:00", "location": "Calle exterior", "relatedSuspects": ["suspect-2", "suspect-4"] },
+      { "id": "ev-5", "type": "Documental", "description": "Correo electronico encontrado citando cifra exacta de la pintura", "location": "Servidor del museo", "relatedSuspects": ["suspect-2"] },
+      { "id": "ev-6", "type": "Fisica", "description": "Guante negro de latex encontrado en escalera de emergencia", "location": "Escalera B", "relatedSuspects": ["suspect-2"] },
+      { "id": "ev-7", "type": "Digital", "description": "Busqueda web sobre 'exportar obras de arte' en el ordenador de Elena", "location": "Oficina de restauracion", "relatedSuspects": ["suspect-2"] },
+      { "id": "ev-8", "type": "Fisica", "description": "Marcas de herramientas en el sistema de alarma", "location": "Panel de control - Sala 3", "relatedSuspects": ["suspect-2"] },
+      { "id": "ev-9", "type": "Documental", "description": "Recibo de compra de somnifero a nombre desconocido", "location": "Farmacia cercana al museo", "relatedSuspects": ["suspect-2", "suspect-4"] },
+      { "id": "ev-10", "type": "Testimonial", "description": "Empleado vio a Elena discutir con el director tres dias antes", "location": "Pasillo administrativo", "relatedSuspects": ["suspect-2", "suspect-1"] }
+    ],
+    "places": [
+      { "id": "pl-1", "name": "Sala 3 - Galeria Principal", "description": "Donde se exhibia la pintura. Encontrada sin la obra y con el marco vacio en el suelo." },
+      { "id": "pl-2", "name": "Sala de Restauracion", "description": "Taller privado de Elena. Contiene herramientas especializadas y materiales quimicos." },
+      { "id": "pl-3", "name": "Sala de Seguridad", "description": "Centro de monitoreo con acceso a todas las camaras. La grabacion fue manipulada." },
+      { "id": "pl-4", "name": "Estacionamiento Subterraneo", "description": "Acceso privado al edificio. Camaras no funcionales la noche del robo." },
+      { "id": "pl-5", "name": "Oficina del Director", "description": "Documentos financieros que revelan deudas. Comunicaciones sospechosas." }
+    ],
+    "timeline": [
+      { "time": "17:30", "event": "Museo cierra al publico. Personal autorizado permanece.", "suspicious": false },
+      { "time": "18:00", "event": "Director Marco Villanueva revisa la pintura y confirma que esta en su lugar.", "suspicious": false },
+      { "time": "19:45", "event": "Elena Rios firma la bitacora de salida del museo.", "suspicious": true },
+      { "time": "21:00", "event": "Guardia Roberto Peña inicia su ronda nocturna.", "suspicious": false },
+      { "time": "22:00", "event": "Roberto toma su cafe de las 10 pm en la sala de descanso.", "suspicious": true },
+      { "time": "22:15", "event": "Las camaras de la Sala 3 son desactivadas remotamente.", "suspicious": true },
+      { "time": "22:30", "event": "Roberto es encontrado inconsciente por otro guardia.", "suspicious": true },
+      { "time": "23:00", "event": "Vehiculo desconocido visto frente al museo (declaracion de testigo).", "suspicious": true },
+      { "time": "23:45", "event": "Sistema de camaras se reactiva automaticamente.", "suspicious": false },
+      { "time": "06:00", "event": "Personal de limpieza descubre el robo y llama a la policia.", "suspicious": false }
+    ],
+    "contradictions": [
+      { "id": "con-1", "statement": "Elena afirma haber salido a las 19:45", "evidence": "Camara exterior la muestra regresando a las 21:30", "suspect": "suspect-2" },
+      { "id": "con-2", "statement": "Carmen dice estar enferma en casa toda la noche", "evidence": "Recibo de farmacia con su descripcion fisica comprado a las 22:00", "suspect": "suspect-4" }
+    ],
+    "rules": [
+      "Si una persona tiene motivo Y medios Y oportunidad, es sospechoso principal.",
+      "Si la coartada de un sospechoso es refutada por evidencia fisica, la coartada es invalida.",
+      "Si dos declaraciones se contradicen mutuamente, al menos una es falsa.",
+      "Si huellas dactilares coinciden con sospechoso, incrementa nivel de sospecha en 30.",
+      "Si sospechoso conoce el sistema de alarmas Y las camaras fueron manipuladas, es posible autor.",
+      "Si el guardia fue drogado Y sospechoso tiene acceso a quimicos, es posible complice.",
+      "Si vehiculo fue visto Y sospechoso no tiene coartada valida en ese horario, incrementa sospecha.",
+      "Si correo electronico menciona valor exacto Y sospechoso es el remitente, es sospechoso.",
+      "Si busqueda web sobre contrabando existe en ordenador de sospechoso, incrementa sospecha.",
+      "Si sospechoso discutio con victima/director recientemente, existe posible conflicto previo."
+    ]
+  },
+  {
+    "id": "caso-2",
+    "title": "El Cientifico Desaparecido",
+    "description": "El Dr. Sergio Montoya, brillante investigador de biotecnologia, ha desaparecido dejando su laboratorio en caos. Sus colegas sospechan que alguien robo su formula revolucionaria antes de su desaparicion.",
+    "difficulty": "Medio",
+    "status": "disponible",
+    "culprit": "suspect-b3",
+    "suspects": [
+      {
+        "id": "suspect-b1",
+        "name": "Dra. Lucia Fuentes",
+        "age": 38,
+        "role": "Investigadora Senior",
+        "description": "Colega cercana del Dr. Montoya. Trabajaron juntos 5 anos.",
+        "alibi": "Afirma haber estado en congreso internacional en otra ciudad",
+        "alibiValid": true,
+        "motive": "Queria el credito de la investigacion",
+        "means": "Acceso total al laboratorio",
+        "suspicionLevel": 30,
+        "statements": ["Estaba en el Congreso de Biotecnologia. Hay cientos de testigos.", "Sergio era mi mejor amigo, jamas le haria dano.", "Creo que la empresa rival esta detras de esto."]
+      },
+      {
+        "id": "suspect-b2",
+        "name": "Andres Castillo",
+        "age": 52,
+        "role": "Director de I+D",
+        "description": "Superior directo del cientifico. Presionaba por resultados rapidos.",
+        "alibi": "Reuniones corporativas documentadas ese dia",
+        "alibiValid": true,
+        "motive": "Presion de la junta directiva por patentes",
+        "means": "Autoridad para acceder a cualquier laboratorio",
+        "suspicionLevel": 40,
+        "statements": ["Mis reuniones estan en el calendario corporativo.", "La desaparicion de Sergio es una perdida enorme.", "Las formulas pertenecen a la empresa, no a el."]
+      },
+      {
+        "id": "suspect-b3",
+        "name": "Viktor Sorokin",
+        "age": 44,
+        "role": "Consultor Externo",
+        "description": "Consultor contratado hace 3 meses. Tiene vinculaciones con empresas competidoras.",
+        "alibi": "Dice haber estado trabajando desde casa",
+        "alibiValid": false,
+        "motive": "Espionaje industrial para empresa rival",
+        "means": "Acceso temporal al laboratorio y sistema informatico",
+        "suspicionLevel": 90,
+        "statements": ["Trabajo desde casa ese dia, nadie puede confirmarlo.", "Solo soy un consultor, no tengo interes en la formula.", "Sergio y yo eramos cordiales, nada mas."]
+      },
+      {
+        "id": "suspect-b4",
+        "name": "Isabel Mora",
+        "age": 26,
+        "role": "Asistente de Laboratorio",
+        "description": "Joven asistente con deudas estudiantiles. Tenia acceso a los archivos del cientifico.",
+        "alibi": "Afirma haber salido temprano ese dia por enfermedad",
+        "alibiValid": false,
+        "motive": "Oferta economica de tercero desconocido",
+        "means": "Conoce los codigos de acceso al servidor de investigacion",
+        "suspicionLevel": 65,
+        "statements": ["Me fui a las 14:00 por migraña, el Dr. Montoya me lo autorizo.", "Vi a Viktor revisando los archivos del Dr. sin permiso la semana pasada.", "Jamas venderia informacion confidencial."]
+      }
+    ],
+    "evidence": [
+      { "id": "ev-b1", "type": "Digital", "description": "Archivos de la formula copiados en USB externo a las 23:15", "location": "Servidor del laboratorio", "relatedSuspects": ["suspect-b3"] },
+      { "id": "ev-b2", "type": "Fisica", "description": "Pluma con logo de empresa rival encontrada en laboratorio", "location": "Mesa de trabajo del Dr. Montoya", "relatedSuspects": ["suspect-b3"] },
+      { "id": "ev-b3", "type": "Digital", "description": "Llamadas frecuentes a numero de empresa competidora desde celular de Viktor", "location": "Registros telefonicos", "relatedSuspects": ["suspect-b3"] },
+      { "id": "ev-b4", "type": "Testimonial", "description": "Guardia vio a Viktor en el edificio a las 22:30, hora en que afirma estar en casa", "location": "Entrada principal", "relatedSuspects": ["suspect-b3"] },
+      { "id": "ev-b5", "type": "Documental", "description": "Transferencia bancaria anonima de $50,000 recibida por cuenta vinculada a Viktor", "location": "Registros financieros", "relatedSuspects": ["suspect-b3"] },
+      { "id": "ev-b6", "type": "Digital", "description": "Acceso al servidor con credenciales del Dr. Montoya desde IP externa", "location": "Logs del servidor", "relatedSuspects": ["suspect-b3", "suspect-b4"] },
+      { "id": "ev-b7", "type": "Fisica", "description": "Nota de renuncia del Dr. Montoya con letra forzada segun grafologo", "location": "Oficina del director", "relatedSuspects": ["suspect-b3"] },
+      { "id": "ev-b8", "type": "Testimonial", "description": "Isabel vio a Viktor revisar archivos sin autorizacion", "location": "Laboratorio principal", "relatedSuspects": ["suspect-b3"] },
+      { "id": "ev-b9", "type": "Documental", "description": "Contrato de Viktor con clausulas de confidencialidad violadas", "location": "Recursos Humanos", "relatedSuspects": ["suspect-b3"] },
+      { "id": "ev-b10", "type": "Digital", "description": "Correos encriptados enviados desde laboratorio a dominio de empresa rival", "location": "Servidor de correo corporativo", "relatedSuspects": ["suspect-b3"] }
+    ],
+    "places": [
+      { "id": "pl-b1", "name": "Laboratorio Principal", "description": "Donde el Dr. Montoya realizaba sus experimentos. Encontrado con equipos desconectados." },
+      { "id": "pl-b2", "name": "Sala de Servidores", "description": "Centro de datos. Los logs muestran accesos no autorizados la noche de la desaparicion." },
+      { "id": "pl-b3", "name": "Oficina de Viktor", "description": "Consultoria temporal. Se encontraron documentos de la empresa rival." },
+      { "id": "pl-b4", "name": "Aparcamiento del edificio", "description": "Camaras muestran el vehiculo de Viktor a las 22:15." },
+      { "id": "pl-b5", "name": "Despacho del Dr. Montoya", "description": "Su ordenador muestra actividad sospechosa a las 23:00." }
+    ],
+    "timeline": [
+      { "time": "08:00", "event": "Dr. Montoya llega al laboratorio y trabaja normalmente.", "suspicious": false },
+      { "time": "14:00", "event": "Isabel se retira del laboratorio por enfermedad.", "suspicious": false },
+      { "time": "17:30", "event": "Personal administrativo abandona el edificio.", "suspicious": false },
+      { "time": "19:00", "event": "Viktor es visto saliendo del edificio. Afirma irse a casa.", "suspicious": true },
+      { "time": "21:45", "event": "Camaras del aparcamiento registran el vehiculo de Viktor.", "suspicious": true },
+      { "time": "22:30", "event": "Guardia ve a Viktor en el pasillo del laboratorio.", "suspicious": true },
+      { "time": "23:15", "event": "Archivos de la formula son copiados en USB externo.", "suspicious": true },
+      { "time": "23:45", "event": "Dr. Montoya no responde llamadas. Ultima senal de su movil.", "suspicious": true },
+      { "time": "07:00", "event": "Colega descubre el laboratorio vacio y llama a autoridades.", "suspicious": false },
+      { "time": "08:30", "event": "Policia inicia investigacion. Viktor no aparece a trabajar.", "suspicious": true }
+    ],
+    "contradictions": [
+      { "id": "con-b1", "statement": "Viktor dice estar en casa toda la noche", "evidence": "Camara del aparcamiento lo muestra en el edificio a las 22:15", "suspect": "suspect-b3" },
+      { "id": "con-b2", "statement": "Isabel dice que se fue a las 14:00 y no regreso", "evidence": "Logs del servidor muestran acceso con sus credenciales a las 20:00", "suspect": "suspect-b4" }
+    ],
+    "rules": [
+      "Si consultor externo accede a archivos fuera de horario, es intrusion.",
+      "Si coartada contradice grabacion de camara, coartada es invalida.",
+      "Si transferencia bancaria coincide con fecha del robo, es evidencia de pago.",
+      "Si empresa rival recibe datos y consultor tiene vinculo con ella, es espionaje.",
+      "Si credenciales son usadas remotamente sin autorizacion, hay robo de identidad digital.",
+      "Si nota de renuncia tiene letra forzada, fue redactada bajo coaccion.",
+      "Si persona con deudas recibe oferta y tiene acceso, puede ser complice.",
+      "Si llamadas a empresa rival son frecuentes, existe contacto previo sospechoso.",
+      "Si acceso al servidor ocurre de noche sin registro de entrada, es acceso no autorizado.",
+      "Si consultor tiene clausulas violadas en contrato, es candidato principal."
+    ]
+  },
+  {
+    "id": "caso-3",
+    "title": "El Gran Hotel",
+    "description": "Un collar de diamantes valorado en $2 millones ha desaparecido de la suite VIP del Hotel Imperiale durante una gala de alto perfil. El collar pertenecia a la condesa Beatriz Von Halter.",
+    "difficulty": "Dificil",
+    "status": "disponible",
+    "culprit": "suspect-c1",
+    "suspects": [
+      {
+        "id": "suspect-c1",
+        "name": "Maximilian Dreer",
+        "age": 41,
+        "role": "Jefe de Conserjes",
+        "description": "Responsable de todos los servicios VIP del hotel. Conoce cada suite y protocolo.",
+        "alibi": "Afirma haber coordinado el evento desde el lobby toda la noche",
+        "alibiValid": false,
+        "motive": "Deudas de juego en casinos clandestinos",
+        "means": "Llaves maestras de todas las suites y conocimiento de los turnos de seguridad",
+        "suspicionLevel": 88,
+        "statements": ["Estuve en el lobby toda la noche coordinando el evento.", "Nunca subi a las suites durante la gala.", "La condesa es nuestra cliente mas importante, la respeto."]
+      },
+      {
+        "id": "suspect-c2",
+        "name": "Sofia Renn",
+        "age": 29,
+        "role": "Camarera de Suite VIP",
+        "description": "Encargada de atender personalmente a la condesa durante su estancia.",
+        "alibi": "Afirma haber estado sirviendo en el salon de gala",
+        "alibiValid": true,
+        "motive": "Ninguno claro, aunque tiene antecedentes de hurto menor",
+        "means": "Acceso a la suite durante el dia",
+        "suspicionLevel": 35,
+        "statements": ["Servi en el salon toda la noche, los meseros pueden confirmarlo.", "Limpie la suite a las 15:00 y el collar estaba sobre el tocador.", "Vi a Maximilian subir con el ascensor privado a las 21:30."]
+      },
+      {
+        "id": "suspect-c3",
+        "name": "Philippe Laurent",
+        "age": 58,
+        "role": "Invitado - Anticuario",
+        "description": "Comerciante de joyas de lujo con reputacion cuestionable en el mercado negro.",
+        "alibi": "Estaba en la gala con decenas de testigos",
+        "alibiValid": true,
+        "motive": "El collar tiene valor extraordinario en mercado privado",
+        "means": "Contactos con compradores internacionales",
+        "suspicionLevel": 50,
+        "statements": ["Estuve en la gala hasta la medianoche, soy un invitado VIP.", "Conozco el valor del collar, pero jamas lo robaria.", "Quizas fue alguien del personal del hotel."]
+      },
+      {
+        "id": "suspect-c4",
+        "name": "Natasha Voronova",
+        "age": 35,
+        "role": "Asistente Personal de la Condesa",
+        "description": "Asistente de confianza. Unica persona ademas de la condesa con acceso directo al collar.",
+        "alibi": "Acompano a la condesa en la gala toda la noche",
+        "alibiValid": false,
+        "motive": "Disputa economica con la condesa por herencia familiar",
+        "means": "Conoce la combinacion de la caja fuerte de la suite",
+        "suspicionLevel": 70,
+        "statements": ["Acompane a la condesa en todo momento durante la gala.", "El collar fue guardado en la caja fuerte antes de bajar.", "Maximilian me parecio nervioso durante toda la noche."]
+      }
+    ],
+    "evidence": [
+      { "id": "ev-c1", "type": "Digital", "description": "Registro del ascensor privado: Maximilian sube a piso VIP a las 21:28", "location": "Sistema de control del hotel", "relatedSuspects": ["suspect-c1"] },
+      { "id": "ev-c2", "type": "Fisica", "description": "Fibra de guante de seda encontrada en la caja fuerte abierta", "location": "Suite VIP 501", "relatedSuspects": ["suspect-c1"] },
+      { "id": "ev-c3", "type": "Digital", "description": "La llave maestra de Maximilian abre la caja fuerte segun log del sistema", "location": "Registro de accesos del hotel", "relatedSuspects": ["suspect-c1"] },
+      { "id": "ev-c4", "type": "Testimonial", "description": "Camarera Sofia vio a Maximilian subir en ascensor privado a las 21:30", "location": "Pasillo del lobby", "relatedSuspects": ["suspect-c1"] },
+      { "id": "ev-c5", "type": "Documental", "description": "Deudas de juego de Maximilian por valor de $180,000 con prestamistas", "location": "Registros financieros privados", "relatedSuspects": ["suspect-c1"] },
+      { "id": "ev-c6", "type": "Digital", "description": "Llamada anonima recibida por Maximilian 2 horas antes del robo", "location": "Registros telefonicos del hotel", "relatedSuspects": ["suspect-c1"] },
+      { "id": "ev-c7", "type": "Fisica", "description": "Caja fuerte fue abierta sin signos de fuerza - requiere codigo o llave maestra", "location": "Suite VIP 501", "relatedSuspects": ["suspect-c1", "suspect-c4"] },
+      { "id": "ev-c8", "type": "Testimonial", "description": "Bartender del evento confirma que Sofia estuvo en el salon toda la noche", "location": "Salon de gala", "relatedSuspects": ["suspect-c2"] },
+      { "id": "ev-c9", "type": "Documental", "description": "Seguro del collar fue revisado por Maximilian una semana antes", "location": "Archivo de seguros del hotel", "relatedSuspects": ["suspect-c1"] },
+      { "id": "ev-c10", "type": "Digital", "description": "Busqueda en telefono de Maximilian: compradores de joyas, precios de diamantes", "location": "Telefono confiscado", "relatedSuspects": ["suspect-c1"] }
+    ],
+    "places": [
+      { "id": "pl-c1", "name": "Suite VIP 501", "description": "Suite de la condesa. La caja fuerte fue encontrada abierta y vacia." },
+      { "id": "pl-c2", "name": "Salon de Gala", "description": "Donde se celebraba el evento. La mayoria de sospechosos estaban aqui." },
+      { "id": "pl-c3", "name": "Cuarto de Conserjes", "description": "Oficina de Maximilian. Se encontraron documentos sobre seguros de joyas." },
+      { "id": "pl-c4", "name": "Ascensor Privado VIP", "description": "Acceso exclusivo al piso 5. Los registros muestran el movimiento de Maximilian." },
+      { "id": "pl-c5", "name": "Recepcion del Hotel", "description": "Centro de operaciones. Logs de llaves maestras almacenados aqui." }
+    ],
+    "timeline": [
+      { "time": "15:00", "event": "Sofia limpia la suite. El collar esta visible sobre el tocador.", "suspicious": false },
+      { "time": "18:00", "event": "La condesa guarda el collar en la caja fuerte antes de la gala.", "suspicious": false },
+      { "time": "19:00", "event": "La gala comienza. Todos los sospechosos bajan al salon.", "suspicious": false },
+      { "time": "20:30", "event": "Maximilian recibe una llamada anonima de 3 minutos.", "suspicious": true },
+      { "time": "21:28", "event": "Ascensor privado registra subida de Maximilian al piso 5.", "suspicious": true },
+      { "time": "21:35", "event": "Log del sistema registra apertura de caja fuerte con llave maestra.", "suspicious": true },
+      { "time": "21:42", "event": "Maximilian regresa al lobby. Sofia lo ve llegar.", "suspicious": true },
+      { "time": "23:00", "event": "La condesa sube a su suite y descubre el robo.", "suspicious": false },
+      { "time": "23:05", "event": "Se activa la alarma del hotel y se alerta a la policia.", "suspicious": false },
+      { "time": "23:30", "event": "Policia interroga a todos los presentes. Maximilian parece nervioso.", "suspicious": true }
+    ],
+    "contradictions": [
+      { "id": "con-c1", "statement": "Maximilian dice haber estado en el lobby toda la noche", "evidence": "Log del ascensor lo muestra en el piso 5 a las 21:28", "suspect": "suspect-c1" },
+      { "id": "con-c2", "statement": "Natasha dice haber acompanado a la condesa en todo momento", "evidence": "La condesa afirma que Natasha se ausentó 15 minutos durante la gala", "suspect": "suspect-c4" }
+    ],
+    "rules": [
+      "Si llave maestra fue usada Y persona tiene la llave, esa persona accedio a la suite.",
+      "Si registro de ascensor contradice coartada, la coartada es invalida.",
+      "Si sospechoso tiene deudas Y objeto robado tiene valor suficiente, existe motivo economico.",
+      "Si llamada anonima precede al robo, puede ser coordinacion previa.",
+      "Si fibra fisica es del tipo que usa el sospechoso, existe conexion con el crimen.",
+      "Si sospechoso busco precios del objeto robado, tenia conocimiento previo del valor.",
+      "Si caja fuerte no fue forzada Y sospechoso tiene acceso, el acceso fue deliberado.",
+      "Si testigo contradice coartada del sospechoso principal, la coartada cae.",
+      "Si sospechoso reviso el seguro del objeto robado, tenia interes previo.",
+      "Si todos los indicios apuntan a un sospechoso, es el responsable logico del caso."
+    ]
+  }
+]

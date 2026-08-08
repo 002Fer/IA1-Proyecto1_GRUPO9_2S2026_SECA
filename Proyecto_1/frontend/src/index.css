@@ -1,0 +1,50 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root {
+  --bg: hsl(220, 15%, 9%);
+  --bg-card: hsl(220, 15%, 13%);
+  --bg-hover: hsl(220, 15%, 17%);
+  --primary: hsl(220, 90%, 60%);
+  --primary-glow: hsl(220, 90%, 60%, 0.3);
+  --secondary: hsl(45, 90%, 55%);
+  --danger: hsl(0, 70%, 55%);
+  --success: hsl(140, 60%, 45%);
+  --warning: hsl(38, 90%, 55%);
+  --text: hsl(0, 0%, 92%);
+  --text-muted: hsl(220, 10%, 55%);
+  --border: hsl(220, 15%, 22%);
+  --radius: 10px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.5);
+  --glass-bg: rgba(255,255,255,0.05);
+  --glass-border: rgba(255,255,255,0.1);
+}
+
+html, body, #root {
+  height: 100%;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { color: var(--secondary); }
+
+button { cursor: pointer; font-family: inherit; }
+
+@keyframes fadeIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slideIn { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:translateX(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 var(--primary-glow); } 50% { box-shadow: 0 0 0 8px transparent; } }
+@keyframes glow { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+.fadeIn { animation: fadeIn 0.4s ease both; }
+.container { width: min(100% - 2rem, 1200px); margin: 0 auto; }

@@ -1,0 +1,7 @@
+﻿.page { text-align: center; padding: 5rem 1rem; animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.icon { font-size: 4rem; display: block; margin-bottom: 1rem; }
+.page h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+.page p { color: var(--text-muted); margin-bottom: 1.5rem; }
+.btn { background: var(--primary); color: #fff; padding: 0.6rem 1.4rem; border-radius: var(--radius); font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.2s; }
+.btn:hover { opacity: 0.88; }
