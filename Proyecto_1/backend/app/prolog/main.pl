@@ -1,0 +1,1 @@
+% Este archivo cargara todo : casos, personas, motivos, lugares, reglas, etc.
