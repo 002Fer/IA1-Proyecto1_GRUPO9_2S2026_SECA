@@ -1,6 +1,7 @@
 % EVIDENCIAS - LOGIC DETECTIVE
 :- consult('casos.pl').
 :- consult('data/evidencias_data.pl').
+:- consult('motivos_medios.pl').
 
 % OBTENER EVIDENCIA
 obtener_evidencia(Caso, Evidencia, Tipo, Descripcion, Lugar) :-
@@ -58,3 +59,41 @@ descripcion_evidencia(Caso, Evidencia, Descripcion) :-
 cantidad_evidencias(Caso, Persona, Cantidad) :-
     findall(Evidencia, evidencia_relacionada(Caso, Evidencia, Persona), Evidencias),
     length(Evidencias, Cantidad).
+
+% INTEGRACION MOTIVOS MEDIOS Y EVIDENCIAS
+indicio_relevante(Persona, Caso) :-
+    posee_motivo(Persona, Caso),
+    once(posee_medios(Persona, Caso)),
+    once(tiene_evidencia(Caso, Persona)).
+
+% JUSTIFICACION COMPLETA
+justificacion_indicio(Persona, Caso, Motivos, Medios, Evidencias) :-
+    findall(Motivo, (motivo(Caso, Persona, Motivo), Motivo \= ninguno_identificado, Motivo \= ninguno_claro), Motivos),
+    findall(Herramienta, posee_herramienta(Caso, Persona, Herramienta), Medios),
+    findall(Evidencia, evidencia_relacionada(Caso, Evidencia, Persona), Evidencias),
+    Motivos \= [],
+    Medios \= [],
+    Evidencias \= [].
+
+
+% RELACIONES ENTRE EVIDENCIAS Y SOSPECHOSOS
+:- dynamic evidencia_relacionada/3.
+
+% CASO 1
+evidencia_relacionada('caso-1','ev-1','suspect-1').
+evidencia_relacionada('caso-1','ev-5','suspect-4').
+evidencia_relacionada('caso-1','ev-7','suspect-2').
+evidencia_relacionada('caso-1','ev-8','suspect-2').
+evidencia_relacionada('caso-1','ev-10','suspect-2').
+
+% CASO 2
+evidencia_relacionada('caso-2','ev-b3','suspect-b3').
+evidencia_relacionada('caso-2','ev-b4','suspect-b3').
+evidencia_relacionada('caso-2','ev-b5','suspect-b3').
+evidencia_relacionada('caso-2','ev-b8','suspect-b4').
+
+% CASO 3
+evidencia_relacionada('caso-3','ev-c1','suspect-c1').
+evidencia_relacionada('caso-3','ev-c3','suspect-c1').
+evidencia_relacionada('caso-3','ev-c5','suspect-c1').
+evidencia_relacionada('caso-3','ev-c8','suspect-c4').
