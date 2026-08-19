@@ -1,4 +1,5 @@
 % INFERENCIAS - LOGIC DETECTIVE
+% Reglas generales de puntaje utilizadas por el equipo.
 :- consult('casos.pl').
 :- consult('motivos_medios.pl').
 :- consult('evidencias.pl').
@@ -22,18 +23,16 @@ puntaje_sospechoso(Persona,Caso,Puntaje) :-
     puntaje_evidencias(Persona,Caso,PuntajeEvidencias),
     Puntaje is PuntajeMotivo + PuntajeMedio + PuntajeEvidencias.
 
-% SOSPECHOSO PRINCIPAL
-sospechoso_principal(Persona,Caso) :-
-    puntaje_sospechoso(Persona,Caso,Puntaje),
-    \+ (puntaje_sospechoso(_,Caso,PuntajeMayor), PuntajeMayor > Puntaje).
+% La regla sospechoso_principal/2 pertenece a Responsabilidad 3 y se define
+% en reglas_investigacion.pl con el orden sospechoso_principal(Caso, Persona).
 
- % EXPLICACION DEL SOSPECHOSO - Esplica por que alguien es sospechoso
+% EXPLICACION DEL SOSPECHOSO
 explicacion_sospechoso(Persona,Caso,Motivos,Medios,Evidencias,Puntaje) :-
-    sospechoso_principal(Persona,Caso),
+    sospechoso_principal(Caso,Persona),
     justificacion_indicio(Persona,Caso,Motivos,Medios,Evidencias),
     puntaje_sospechoso(Persona,Caso,Puntaje).
 
-% DETERMINAR CULPABLE
+% DETERMINAR CULPABLE (compatibilidad con las reglas generales del equipo)
 culpable(Persona,Caso) :-
-    sospechoso_principal(Persona,Caso),
+    sospechoso_principal(Caso,Persona),
     indicio_completo(Persona,Caso).
