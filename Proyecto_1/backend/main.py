@@ -1,6 +1,6 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import contradicciones
+from app.routers import contradicciones, responsabilidad3
 
 app = FastAPI(
     title="Logic Detective API",
@@ -18,6 +18,7 @@ app.add_middleware(
 )
 
 # Registrar Routers
+app.include_router(responsabilidad3.router)
 app.include_router(contradicciones.router)
 
 @app.get("/", tags=["Health Check"])
