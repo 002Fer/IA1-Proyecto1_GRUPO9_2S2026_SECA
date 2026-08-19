@@ -1,7 +1,7 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGame } from "../context/GameContext.jsx";
-import { getCaseById, getHint } from "../utils/api.js";
+import { getCaseById, getHint, registerAction, getWitnesses, getCameras, getAccessRecords, getTestimonies } from "../utils/api.js";
 import SuspectCard from "../components/investigation/SuspectCard.jsx";
 import EvidenceItem from "../components/investigation/EvidenceItem.jsx";
 import TimelineView from "../components/investigation/TimelineView.jsx";
@@ -9,7 +9,7 @@ import ContradictionAlert from "../components/investigation/ContradictionAlert.j
 import AccusationModal from "../components/investigation/AccusationModal.jsx";
 import styles from "./InvestigationDashboard.module.css";
 
-const TABS = ["Descripción", "Sospechosos", "Evidencias", "Lugares", "Cronología", "Contradicciones", "Pistas"];
+const TABS = ["Descripción", "Sospechosos", "Evidencias", "Lugares", "Cronología", "Testimonios", "Coartadas", "Cámaras", "Accesos", "Contradicciones", "Pistas"];
 
 export default function InvestigationDashboard() {
   const { caseId } = useParams();
@@ -22,20 +22,35 @@ export default function InvestigationDashboard() {
   const [hintsUsed, setHintsUsed] = useState(0);
   const [showAccuse, setShowAccuse] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [investigationData, setInvestigationData] = useState({ witnesses: [], cameras: [], access: [], testimonies: [] });
 
   useEffect(() => {
     getCaseById(caseId)
-      .then((c) => { setCaseData(c); logAction(`Investigación iniciada: ${c.title}`); setLoading(false); })
+      .then(async (c) => {
+        setCaseData(c);
+        const [witnesses, cameras, access, testimonies] = await Promise.all([
+          getWitnesses(caseId).catch(() => []),
+          getCameras(caseId).catch(() => []),
+          getAccessRecords(caseId).catch(() => []),
+          getTestimonies(caseId).catch(() => []),
+        ]);
+        setInvestigationData({ witnesses, cameras, access, testimonies });
+        logAction(`Investigación iniciada: ${c.title}`);
+        registerAction(caseId, `Investigación iniciada: ${c.title}`);
+        setLoading(false);
+      })
       .catch(() => { navigate("/cases"); });
   }, [caseId]);
 
   const handleTab = (tab) => {
     setActiveTab(tab);
     logAction(`Sección consultada: ${tab}`);
+    registerAction(caseId, `Sección consultada: ${tab}`);
   };
 
   const handleInterrogate = (suspect) => {
     logAction(`Interrogatorio a: ${suspect.name}`);
+    registerAction(caseId, `Interrogatorio a: ${suspect.name}`);
   };
 
   const handleHint = async () => {
@@ -44,6 +59,7 @@ export default function InvestigationDashboard() {
     setHint(h);
     setHintsUsed((n) => n + 1);
     logAction(`Pista solicitada (${hintsUsed + 1}/3)`);
+    registerAction(caseId, `Pista solicitada (${hintsUsed + 1}/3)`);
   };
 
   if (loading) return <div className={styles.loading}><div className={styles.spinner}></div></div>;
@@ -171,6 +187,51 @@ export default function InvestigationDashboard() {
             </div>
           )}
 
+          {activeTab === "Testimonios" && (
+            <div className={styles.section}>
+              <h3>Testimonios registrados</h3>
+              <div className={styles.testimonyList}>
+                {investigationData.testimonies.map((t, i) => (
+                  <div className={styles.testimonyCard} key={`${t.suspectId}-${i}`}>
+                    <strong>{t.suspectName}</strong><span className={styles.meta}>{t.type}</span>
+                    <p>“{t.statement}”</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "Coartadas" && (
+            <div className={styles.section}>
+              <h3>Coartadas</h3>
+              <div className={styles.alibiList}>
+                {caseData.suspects.map((s) => (
+                  <div className={`${styles.alibiCard} ${s.alibiValid ? styles.alibiValid : styles.alibiInvalid}`} key={s.id}>
+                    <strong>{s.name}</strong><span>{s.alibiValid ? "✓ Válida" : "✗ Inválida"}</span><p>{s.alibi}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "Cámaras" && (
+            <div className={styles.section}>
+              <h3>Cámaras de seguridad</h3>
+              <div className={styles.recordList}>
+                {investigationData.cameras.map((c) => <div className={styles.recordCard} key={c.id}><strong>{c.location}</strong><span>{c.start}{c.end !== c.start ? ` – ${c.end}` : ""}</span><p>{c.observation}</p></div>)}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "Accesos" && (
+            <div className={styles.section}>
+              <h3>Registros de acceso</h3>
+              <div className={styles.recordList}>
+                {investigationData.access.map((a, i) => <div className={styles.recordCard} key={`${a.suspectId}-${i}`}><strong>{a.suspectName}</strong><span>{a.time} · {a.location}</span><p>Fuente: {a.source} · Acción: {a.action}</p></div>)}
+              </div>
+            </div>
+          )}
+
           {activeTab === "Contradicciones" && (
             <div className={styles.section}>
               <h3>Contradicciones Detectadas</h3>
@@ -192,7 +253,7 @@ export default function InvestigationDashboard() {
 
         {/* Bottom actions */}
         <div className={styles.bottomBar}>
-          <button className={styles.accuseBtn} onClick={() => { setShowAccuse(true); logAction("Acusación iniciada"); }}>
+          <button className={styles.accuseBtn} onClick={() => { setShowAccuse(true); logAction("Acusación iniciada"); registerAction(caseId, "Acusación iniciada"); }}>
             ⚖️ Emitir Acusación Final
           </button>
         </div>

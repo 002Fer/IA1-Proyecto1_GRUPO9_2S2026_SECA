@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGame } from "../context/GameContext.jsx";
 import styles from "./CaseSelection.module.css";
@@ -51,9 +51,9 @@ export default function CaseSelection() {
             <h2 className={styles.title}>{c.title}</h2>
             <p className={styles.desc}>{c.description}</p>
             <div className={styles.stats}>
-              <div className={styles.stat}><span>🕵️</span><strong>{c.suspects.length}</strong><small>Sospechosos</small></div>
-              <div className={styles.stat}><span>🔎</span><strong>{c.evidence.length}</strong><small>Evidencias</small></div>
-              <div className={styles.stat}><span>📍</span><strong>{c.places.length}</strong><small>Lugares</small></div>
+              <div className={styles.stat}><span>🕵️</span><strong>{c.suspectsCount ?? c.suspects?.length ?? 0}</strong><small>Sospechosos</small></div>
+              <div className={styles.stat}><span>🔎</span><strong>{c.evidenceCount ?? c.evidence?.length ?? 0}</strong><small>Evidencias</small></div>
+              <div className={styles.stat}><span>📍</span><strong>{c.placesCount ?? c.places?.length ?? 0}</strong><small>Lugares</small></div>
             </div>
             <button className={styles.startBtn} onClick={() => handleStart(c)}>
               Iniciar Investigación →

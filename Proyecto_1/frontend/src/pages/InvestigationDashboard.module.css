@@ -79,3 +79,13 @@
   .sidebar { max-height: 260px; }
   .infoGrid { grid-template-columns: repeat(2,1fr); }
 }
+
+.testimonyList, .alibiList, .recordList { display: grid; gap: 0.8rem; }
+.testimonyCard, .alibiCard, .recordCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; }
+.testimonyCard { display: grid; gap: 0.35rem; }
+.testimonyCard p, .alibiCard p, .recordCard p { color: var(--text-muted); line-height: 1.55; margin: 0.35rem 0 0; }
+.meta, .recordCard span { font-size: 0.72rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+.alibiCard { border-left: 4px solid var(--border); }
+.alibiValid { border-left-color: #4caf50; }
+.alibiInvalid { border-left-color: #f44336; }
+.alibiCard > span { float: right; font-size: 0.78rem; font-weight: 700; }

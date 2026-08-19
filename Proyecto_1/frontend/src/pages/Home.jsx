@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useGame } from "../context/GameContext.jsx";
 import styles from "./Home.module.css";
@@ -75,8 +75,8 @@ export default function Home() {
               <h3 className={styles.caseTitle}>{c.title}</h3>
               <p className={styles.caseDesc}>{c.description.slice(0, 120)}...</p>
               <div className={styles.caseMeta}>
-                <span>🕵️ {c.suspects.length} sospechosos</span>
-                <span>🔎 {c.evidence.length} evidencias</span>
+                <span>🕵️ {c.suspectsCount ?? c.suspects?.length ?? 0} sospechosos</span>
+                <span>🔎 {c.evidenceCount ?? c.evidence?.length ?? 0} evidencias</span>
               </div>
               <button className={styles.caseBtn} onClick={() => handleStart(c)}>
                 Iniciar Investigación →

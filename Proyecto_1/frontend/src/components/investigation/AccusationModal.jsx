@@ -1,6 +1,6 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import styles from "./AccusationModal.module.css";
-import { accuse } from "../../utils/api.js";
+import { accuse, registerAction } from "../../utils/api.js";
 
 export default function AccusationModal({ caseData, onClose, onLog }) {
   const [selected, setSelected] = useState("");
@@ -12,7 +12,9 @@ export default function AccusationModal({ caseData, onClose, onLog }) {
     setLoading(true);
     const res = await accuse(caseData.id, selected);
     setResult(res);
-    onLog(`Acusación emitida contra: ${caseData.suspects.find(s=>s.id===selected)?.name}`);
+    const accusedName = caseData.suspects.find(s=>s.id===selected)?.name || selected;
+    onLog(`Acusación emitida contra: ${accusedName}`);
+    registerAction(caseData.id, `Acusación emitida contra: ${accusedName}`);
     setLoading(false);
   };
 
@@ -53,10 +55,10 @@ export default function AccusationModal({ caseData, onClose, onLog }) {
             <span className={styles.resultIcon}>{result.correct ? "✅" : "❌"}</span>
             <h3>{result.correct ? "¡Caso Resuelto!" : "Acusación Incorrecta"}</h3>
             <p>{result.message}</p>
-            {!result.correct && <p className={styles.culprit}>El culpable era: <strong>{result.culprit}</strong></p>}
+            {!result.correct && <p className={styles.culprit}>El culpable era: <strong>{result.culpritName}</strong></p>}
             <div className={styles.rules}>
               <strong>Reglas lógicas activadas:</strong>
-              <ul>{result.explanation.map((r, i) => <li key={i}>{r}</li>)}</ul>
+              <ul>{result.rules.map((r, i) => <li key={i}>{r}</li>)}</ul>
             </div>
             <button className={styles.closeBtn} onClick={onClose}>Cerrar</button>
           </div>

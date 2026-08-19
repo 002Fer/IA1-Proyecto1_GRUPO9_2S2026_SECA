@@ -1,5 +1,5 @@
-﻿import React, { createContext, useContext, useReducer, useEffect } from "react";
-import cases from "../assets/mocks/cases.json";
+import React, { createContext, useContext, useReducer, useEffect } from "react";
+import { getCases } from "../utils/api.js";
 
 const GameContext = createContext(null);
 
@@ -46,7 +46,7 @@ export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    dispatch({ type: "SET_CASES", payload: cases });
+    getCases().then((data) => dispatch({ type: "SET_CASES", payload: data })).catch(() => {});
   }, []);
 
   const logAction = (text) => dispatch({ type: "LOG_ACTION", payload: text });
