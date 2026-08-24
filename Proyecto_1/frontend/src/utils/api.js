@@ -105,3 +105,24 @@ export async function getInvestigationLog(caseId) {
   try { return await request(`/log/${caseId}`); }
   catch (_) { return []; }
 }
+
+export async function createAdminCase(caseData) {
+  return request("/admin/cases", {
+    method: "POST",
+    body: JSON.stringify(caseData),
+  });
+}
+
+export async function updateAdminCase(caseId, caseData) {
+  return request(`/admin/cases/${caseId}`, {
+    method: "PUT",
+    body: JSON.stringify(caseData),
+  });
+}
+
+export async function deleteAdminCase(caseId) {
+  return request(`/admin/cases/${caseId}`, {
+    method: "DELETE",
+  });
+}
+

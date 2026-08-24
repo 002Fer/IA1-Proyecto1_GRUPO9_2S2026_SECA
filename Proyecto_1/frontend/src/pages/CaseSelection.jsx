@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGame } from "../context/GameContext.jsx";
 import styles from "./CaseSelection.module.css";
@@ -6,9 +6,13 @@ import styles from "./CaseSelection.module.css";
 const difficultyColor = { Facil: "#4caf50", Medio: "#ff9800", Dificil: "#f44336" };
 
 export default function CaseSelection() {
-  const { cases, selectCase } = useGame();
+  const { cases, selectCase, refreshCases } = useGame();
   const navigate = useNavigate();
   const [filter, setFilter] = useState("Todos");
+
+  useEffect(() => {
+    refreshCases();
+  }, [refreshCases]);
 
   const filtered = filter === "Todos" ? cases : cases.filter((c) => c.difficulty === filter);
 
@@ -51,9 +55,9 @@ export default function CaseSelection() {
             <h2 className={styles.title}>{c.title}</h2>
             <p className={styles.desc}>{c.description}</p>
             <div className={styles.stats}>
-              <div className={styles.stat}><span>🕵️</span><strong>{c.suspectsCount ?? c.suspects?.length ?? 0}</strong><small>Sospechosos</small></div>
-              <div className={styles.stat}><span>🔎</span><strong>{c.evidenceCount ?? c.evidence?.length ?? 0}</strong><small>Evidencias</small></div>
-              <div className={styles.stat}><span>📍</span><strong>{c.placesCount ?? c.places?.length ?? 0}</strong><small>Lugares</small></div>
+              <div className={styles.stat}><strong>{c.suspectsCount ?? c.suspects?.length ?? 0}</strong><small>Sospechosos</small></div>
+              <div className={styles.stat}><strong>{c.evidenceCount ?? c.evidence?.length ?? 0}</strong><small>Evidencias</small></div>
+              <div className={styles.stat}><strong>{c.placesCount ?? c.places?.length ?? 0}</strong><small>Lugares</small></div>
             </div>
             <button className={styles.startBtn} onClick={() => handleStart(c)}>
               Iniciar Investigación →

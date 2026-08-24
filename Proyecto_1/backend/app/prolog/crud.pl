@@ -5,6 +5,15 @@
 :- consult('data/evidencias_relaciones_data.pl').
 :- consult('data/declaraciones_data.pl').
 
+% Resolver ruta relativa al directorio de este archivo Prolog
+ruta_archivo(Rel, Abs) :-
+    ( source_file(crear_caso(_,_,_,_), File) ->
+        file_directory_name(File, Dir),
+        atomic_list_concat([Dir, '/', Rel], Abs)
+    ;
+        Abs = Rel
+    ).
+
 % CREAR CASO
 crear_caso(Id,Titulo,Descripcion,Dificultad) :-
     \+ caso(Id,_,_,_),
@@ -30,6 +39,15 @@ eliminar_caso(Id) :-
     retractall(evidencia(Id,_,_,_,_)),
     retractall(evidencia_relacionada(Id,_,_)),
     retractall(declaracion(Id,_,_,_,_)),
+    retractall(lugar(Id,_,_)),
+    retractall(coartada(Id,_,_,_,_)),
+    retractall(testimonio(Id,_,_,_)),
+    retractall(contradiccion(Id,_,_,_)),
+    retractall(linea_tiempo(Id,_,_,_)),
+    retractall(testigo(Id,_,_,_,_)),
+    retractall(camara(Id,_,_,_,_,_)),
+    retractall(registro_acceso(Id,_,_,_,_,_)),
+    retractall(perfil(Id,_,_,_,_)),
     guardar_casos,
     guardar_motivos_medios,
     guardar_evidencias,
@@ -56,7 +74,8 @@ eliminar_persona(Caso,Id) :-
 
 % GUARDAR DATOS
 guardar_casos :-
-    open('data/casos_data.pl',write,Stream),
+    ruta_archivo('data/casos_data.pl', RutaCasos),
+    open(RutaCasos,write,Stream),
     write(Stream,'% CASOS - LOGIC DETECTIVE'), nl(Stream), nl(Stream),
     write(Stream,':- dynamic caso/4.'), nl(Stream),
     write(Stream,':- dynamic persona/4.'), nl(Stream), nl(Stream),
@@ -146,7 +165,8 @@ eliminar_conocimiento(Caso,Persona,Conocimiento) :-
 
 % GUARDAR MOTIVOS Y MEDIOS
 guardar_motivos_medios :-
-    open('data/motivos_medios_data.pl',write,Stream),
+    ruta_archivo('data/motivos_medios_data.pl', RutaMM),
+    open(RutaMM,write,Stream),
     write(Stream,'% DATOS DE MOTIVOS Y MEDIOS'), nl(Stream), nl(Stream),
     write(Stream,':- dynamic motivo/3.'), nl(Stream),
     write(Stream,':- dynamic herramienta/3.'), nl(Stream),
@@ -265,7 +285,8 @@ eliminar_evidencia(Caso,Id) :-
 
 % GUARDAR EVIDENCIAS
 guardar_evidencias :-
-    open('data/evidencias_data.pl',write,Stream),
+    ruta_archivo('data/evidencias_data.pl', RutaEv),
+    open(RutaEv,write,Stream),
     write(Stream,'% DATOS DE EVIDENCIAS'), nl(Stream), nl(Stream),
     write(Stream,':- dynamic evidencia/5.'), nl(Stream), nl(Stream),
     forall(evidencia(Caso,Id,Tipo,Descripcion,Persona),
@@ -296,7 +317,8 @@ eliminar_relacion_evidencia(Caso,Evidencia,Persona) :-
 
 % GUARDAR RELACIONES DE EVIDENCIA
 guardar_relaciones_evidencia :-
-    open('data/evidencias_relaciones_data.pl',write,Stream),
+    ruta_archivo('data/evidencias_relaciones_data.pl', RutaRel),
+    open(RutaRel,write,Stream),
     write(Stream,'% RELACIONES DE EVIDENCIAS - LOGIC DETECTIVE'), nl(Stream), nl(Stream),
     write(Stream,':- dynamic evidencia_relacionada/3.'), nl(Stream), nl(Stream),
     forall(evidencia_relacionada(Caso,Evidencia,Persona),
@@ -334,14 +356,26 @@ eliminar_declaracion(Caso,Id) :-
 
 % GUARDAR DECLARACIONES
 guardar_declaraciones :-
-    open('data/declaraciones_data.pl',write,Stream),
-    write(Stream,'% DECLARACIONES - LOGIC DETECTIVE'), nl(Stream), nl(Stream),
-    write(Stream,':- dynamic declaracion/5.'), nl(Stream), nl(Stream),
+    ruta_archivo('data/declaraciones_data.pl', RutaDec),
+    open(RutaDec,write,Stream),
+    write(Stream,'% DECLARACIONES DATA - LOGIC DETECTIVE'), nl(Stream), nl(Stream),
+    write(Stream,':- discontiguous declaracion/6.'), nl(Stream),
+    write(Stream,':- discontiguous declaracion/5.'), nl(Stream),
+    write(Stream,':- discontiguous registro_ubicacion_real/5.'), nl(Stream),
+    write(Stream,':- discontiguous relacion_previa/4.'), nl(Stream), nl(Stream),
+    write(Stream,':- dynamic declaracion/6.'), nl(Stream),
+    write(Stream,':- dynamic declaracion/5.'), nl(Stream),
+    write(Stream,':- dynamic registro_ubicacion_real/5.'), nl(Stream),
+    write(Stream,':- dynamic relacion_previa/4.'), nl(Stream), nl(Stream),
     forall(declaracion(Caso,Id,Persona,Texto,Tipo),
-           escribir_declaracion(Stream,Caso,Id,Persona,Texto,Tipo)),
+           (writeq(Stream,declaracion(Caso,Id,Persona,Texto,Tipo)), write(Stream,'.'), nl(Stream))),
+    nl(Stream),
+    forall(declaracion(Caso,Persona,Afirmacion,H1,H2,Lugar),
+           (writeq(Stream,declaracion(Caso,Persona,Afirmacion,H1,H2,Lugar)), write(Stream,'.'), nl(Stream))),
+    nl(Stream),
+    forall(registro_ubicacion_real(Caso,Persona,Hora,Lugar,Fuente),
+           (writeq(Stream,registro_ubicacion_real(Caso,Persona,Hora,Lugar,Fuente)), write(Stream,'.'), nl(Stream))),
+    nl(Stream),
+    forall(relacion_previa(Caso,P1,P2,Rel),
+           (writeq(Stream,relacion_previa(Caso,P1,P2,Rel)), write(Stream,'.'), nl(Stream))),
     close(Stream).
-
-% ESCRIBIR DECLARACION
-escribir_declaracion(Stream,Caso,Id,Persona,Texto,Tipo) :-
-    writeq(Stream,declaracion(Caso,Id,Persona,Texto,Tipo)),
-    write(Stream,'.'), nl(Stream).

@@ -1,4 +1,4 @@
-﻿.card {
+.card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -41,8 +41,33 @@
   font-size: 0.85rem;
   font-weight: 600;
   transition: all 0.2s;
+  cursor: pointer;
 }
 .btnInterrogate:hover { background: var(--primary); color: #fff; }
+
+.btnAnalyze {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.btnAnalyze:hover { background: #eab308; color: #000; }
+
+.btnAnalyzed {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: default;
+}
 .testimony {
   background: rgba(255,255,255,0.03);
   border-radius: 8px;

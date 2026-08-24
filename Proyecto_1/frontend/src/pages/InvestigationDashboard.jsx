@@ -23,6 +23,7 @@ export default function InvestigationDashboard() {
   const [showAccuse, setShowAccuse] = useState(false);
   const [loading, setLoading] = useState(true);
   const [investigationData, setInvestigationData] = useState({ witnesses: [], cameras: [], access: [], testimonies: [] });
+  const [analyzedSuspects, setAnalyzedSuspects] = useState({});
 
   useEffect(() => {
     getCaseById(caseId)
@@ -53,6 +54,12 @@ export default function InvestigationDashboard() {
     registerAction(caseId, `Interrogatorio a: ${suspect.name}`);
   };
 
+  const handleAnalyzeSuspect = (suspect) => {
+    setAnalyzedSuspects((prev) => ({ ...prev, [suspect.id]: true }));
+    logAction(`Inferencia en Prolog: ${suspect.name} -> Nivel de sospecha: ${suspect.suspicionLevel}%`);
+    registerAction(caseId, `Inferencia en Prolog: ${suspect.name} -> Nivel de sospecha: ${suspect.suspicionLevel}%`);
+  };
+
   const handleHint = async () => {
     if (hintsUsed >= 3) return;
     const h = await getHint(caseId);
@@ -77,21 +84,24 @@ export default function InvestigationDashboard() {
 
         <div className={styles.suspicionSection}>
           <h4>Nivel de Sospecha</h4>
-          {caseData.suspects.map((s) => (
-            <div key={s.id} className={styles.suspBar}>
-              <span className={styles.suspName}>{s.name.split(" ")[0]}</span>
-              <div className={styles.barTrack}>
-                <div
-                  className={styles.barFill}
-                  style={{
-                    width: `${s.suspicionLevel}%`,
-                    background: s.suspicionLevel >= 70 ? "#f44336" : s.suspicionLevel >= 40 ? "#ff9800" : "#4caf50"
-                  }}
-                />
+          {caseData.suspects.map((s) => {
+            const isAnalyzed = analyzedSuspects[s.id];
+            return (
+              <div key={s.id} className={styles.suspBar}>
+                <span className={styles.suspName}>{s.name.split(" ")[0]}</span>
+                <div className={styles.barTrack}>
+                  <div
+                    className={styles.barFill}
+                    style={{
+                      width: isAnalyzed ? `${s.suspicionLevel}%` : "0%",
+                      background: s.suspicionLevel >= 70 ? "#f44336" : s.suspicionLevel >= 40 ? "#ff9800" : "#4caf50"
+                    }}
+                  />
+                </div>
+                <span className={styles.suspPct}>{isAnalyzed ? `${s.suspicionLevel}%` : "??%"}</span>
               </div>
-              <span className={styles.suspPct}>{s.suspicionLevel}%</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className={styles.logSection}>
@@ -132,10 +142,10 @@ export default function InvestigationDashboard() {
               <h3>Descripción del Caso</h3>
               <p className={styles.descText}>{caseData.description}</p>
               <div className={styles.infoGrid}>
-                <div className={styles.infoCard}><span>🕵️</span><strong>{caseData.suspects.length}</strong><small>Sospechosos</small></div>
-                <div className={styles.infoCard}><span>🔎</span><strong>{caseData.evidence.length}</strong><small>Evidencias</small></div>
-                <div className={styles.infoCard}><span>📍</span><strong>{caseData.places.length}</strong><small>Lugares</small></div>
-                <div className={styles.infoCard}><span>📋</span><strong>{caseData.rules.length}</strong><small>Reglas</small></div>
+                <div className={styles.infoCard}><strong>{caseData.suspects.length}</strong><small>Sospechosos</small></div>
+                <div className={styles.infoCard}><strong>{caseData.evidence.length}</strong><small>Evidencias</small></div>
+                <div className={styles.infoCard}><strong>{caseData.places.length}</strong><small>Lugares</small></div>
+                <div className={styles.infoCard}><strong>{caseData.rules.length}</strong><small>Reglas</small></div>
               </div>
             </div>
           )}
@@ -145,7 +155,12 @@ export default function InvestigationDashboard() {
               <h3>Sospechosos</h3>
               <div className={styles.suspectsGrid}>
                 {caseData.suspects.map((s) => (
-                  <SuspectCard key={s.id} suspect={s} onInterrogate={handleInterrogate} />
+                  <SuspectCard 
+                    key={s.id} 
+                    suspect={s} 
+                    onInterrogate={handleInterrogate} 
+                    onAnalyze={handleAnalyzeSuspect} 
+                  />
                 ))}
               </div>
             </div>
@@ -173,7 +188,6 @@ export default function InvestigationDashboard() {
                       <h4>{p.name}</h4>
                       <p>{p.description}</p>
                     </div>
-                    <span className={styles.placeIcon}>📍</span>
                   </div>
                 ))}
               </div>
@@ -194,7 +208,7 @@ export default function InvestigationDashboard() {
                 {investigationData.testimonies.map((t, i) => (
                   <div className={styles.testimonyCard} key={`${t.suspectId}-${i}`}>
                     <strong>{t.suspectName}</strong><span className={styles.meta}>{t.type}</span>
-                    <p>“{t.statement}”</p>
+                    <p>"{t.statement}"</p>
                   </div>
                 ))}
               </div>
@@ -207,7 +221,7 @@ export default function InvestigationDashboard() {
               <div className={styles.alibiList}>
                 {caseData.suspects.map((s) => (
                   <div className={`${styles.alibiCard} ${s.alibiValid ? styles.alibiValid : styles.alibiInvalid}`} key={s.id}>
-                    <strong>{s.name}</strong><span>{s.alibiValid ? "✓ Válida" : "✗ Inválida"}</span><p>{s.alibi}</p>
+                    <strong>{s.name}</strong><span>{s.alibiValid ? "Válida" : "Inválida"}</span><p>{s.alibi}</p>
                   </div>
                 ))}
               </div>
@@ -244,9 +258,9 @@ export default function InvestigationDashboard() {
               <h3>Sistema de Pistas</h3>
               <p className={styles.hintInfo}>Tienes <strong>{3 - hintsUsed}</strong> pistas disponibles.</p>
               <button className={styles.hintBtn} onClick={handleHint} disabled={hintsUsed >= 3}>
-                {hintsUsed >= 3 ? "Sin pistas disponibles" : "🔮 Solicitar Pista"}
+                {hintsUsed >= 3 ? "Sin pistas disponibles" : "Solicitar Pista"}
               </button>
-              {hint && <div className={styles.hintBox}><span>💡</span><p>{hint}</p></div>}
+              {hint && <div className={styles.hintBox}><p>{hint}</p></div>}
             </div>
           )}
         </div>
@@ -254,7 +268,7 @@ export default function InvestigationDashboard() {
         {/* Bottom actions */}
         <div className={styles.bottomBar}>
           <button className={styles.accuseBtn} onClick={() => { setShowAccuse(true); logAction("Acusación iniciada"); registerAction(caseId, "Acusación iniciada"); }}>
-            ⚖️ Emitir Acusación Final
+            Emitir Acusación Final
           </button>
         </div>
       </div>

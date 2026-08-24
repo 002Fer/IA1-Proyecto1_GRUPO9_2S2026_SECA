@@ -1,6 +1,16 @@
 % LOGIC DETECTIVE - DATOS DE INVESTIGACION
 % Hechos agrupados por predicado para mantener el archivo Prolog limpio.
 
+:- dynamic lugar/3.
+:- dynamic coartada/5.
+:- dynamic testimonio/4.
+:- dynamic contradiccion/4.
+:- dynamic linea_tiempo/4.
+:- dynamic testigo/5.
+:- dynamic camara/6.
+:- dynamic registro_acceso/6.
+:- dynamic perfil/5.
+
 % ===== lugar/3 =====
 %% Hechos de lugar/3.
 lugar('caso-1','pl-1','Sala 3 - Galeria Principal: Donde se exhibia la pintura. Encontrada sin la obra y con el marco vacio en el suelo.').

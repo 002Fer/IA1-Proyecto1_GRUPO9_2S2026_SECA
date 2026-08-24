@@ -18,3 +18,6 @@
 
 % Responsabilidad 4: declaraciones, contradicciones y cómplices.
 :- consult('declaraciones_contradicciones.pl').
+
+% Responsabilidad 2: CRUD y persistencia administrativa.
+:- consult('crud.pl').
