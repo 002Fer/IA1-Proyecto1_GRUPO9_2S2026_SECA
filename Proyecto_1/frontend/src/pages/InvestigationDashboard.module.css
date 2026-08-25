@@ -1,4 +1,4 @@
-﻿.page { display: grid; grid-template-columns: 270px 1fr; gap: 1rem; height: calc(100vh - 120px); }
+.page { display: grid; grid-template-columns: 270px 1fr; gap: 1rem; height: calc(100vh - 120px); }
 .loading { display: flex; align-items: center; justify-content: center; height: 60vh; }
 .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -66,12 +66,28 @@
 .hintBox { background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.3); border-radius: var(--radius); padding: 1rem; display: flex; gap: 0.7rem; align-items: flex-start; animation: fadeIn 0.3s ease; }
 .hintBox span { font-size: 1.3rem; }
 .hintBox p { font-size: 0.9rem; color: var(--secondary); }
-.bottomBar { display: flex; justify-content: flex-end; padding-top: 0.8rem; border-top: 1px solid var(--border); flex-shrink: 0; }
+.bottomBar { display: flex; justify-content: flex-end; gap: 12px; padding-top: 0.8rem; border-top: 1px solid var(--border); flex-shrink: 0; }
+.reportBtn {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid #3b82f6;
+  padding: 0.7rem 1.3rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.reportBtn:hover {
+  background: #3b82f6;
+  color: #ffffff;
+}
 .accuseBtn {
   background: linear-gradient(90deg, hsl(0,70%,50%), hsl(20,80%,50%));
   color: #fff; border: none; padding: 0.7rem 1.5rem;
   border-radius: var(--radius); font-weight: 700; font-size: 0.95rem;
   transition: all 0.2s;
+  cursor: pointer;
 }
 .accuseBtn:hover { opacity: 0.88; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(244,67,54,0.3); }
 @media (max-width: 768px) {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styles from "./AccusationModal.module.css";
 import { accuse, registerAction } from "../../utils/api.js";
 
-export default function AccusationModal({ caseData, onClose, onLog }) {
+export default function AccusationModal({ caseData, onClose, onLog, onViewReport }) {
   const [selected, setSelected] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -56,7 +56,20 @@ export default function AccusationModal({ caseData, onClose, onLog }) {
               <strong>Reglas lógicas activadas:</strong>
               <ul>{result.rules.map((r, i) => <li key={i}>{r}</li>)}</ul>
             </div>
-            <button className={styles.closeBtn} onClick={onClose}>Cerrar</button>
+            <div style={{ display: "flex", gap: "10px", marginTop: "1rem" }}>
+              <button 
+                type="button"
+                className={styles.accuseBtn} 
+                style={{ background: "#3b82f6", color: "#fff", flex: 1 }}
+                onClick={() => {
+                  onClose();
+                  if (onViewReport) onViewReport(result);
+                }}
+              >
+                Ver Informe Pericial Completo
+              </button>
+              <button className={styles.closeBtn} onClick={onClose} style={{ flex: 1 }}>Cerrar</button>
+            </div>
           </div>
         )}
       </div>

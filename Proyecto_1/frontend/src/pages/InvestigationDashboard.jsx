@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGame } from "../context/GameContext.jsx";
 import { getCaseById, getHint, registerAction, getWitnesses, getCameras, getAccessRecords, getTestimonies } from "../utils/api.js";
-import SuspectCard from "../components/investigation/SuspectCard.jsx";
+import SuspectCard, { getSuspectCurrentScore } from "../components/investigation/SuspectCard.jsx";
 import EvidenceItem from "../components/investigation/EvidenceItem.jsx";
 import TimelineView from "../components/investigation/TimelineView.jsx";
 import ContradictionAlert from "../components/investigation/ContradictionAlert.jsx";
 import AccusationModal from "../components/investigation/AccusationModal.jsx";
+import CaseReportModal from "../components/investigation/CaseReportModal.jsx";
 import styles from "./InvestigationDashboard.module.css";
 
 const TABS = ["Descripción", "Sospechosos", "Evidencias", "Lugares", "Cronología", "Testimonios", "Coartadas", "Cámaras", "Accesos", "Contradicciones", "Pistas"];
@@ -21,9 +22,13 @@ export default function InvestigationDashboard() {
   const [hint, setHint] = useState(null);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [showAccuse, setShowAccuse] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [lastAccusationResult, setLastAccusationResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [investigationData, setInvestigationData] = useState({ witnesses: [], cameras: [], access: [], testimonies: [] });
-  const [analyzedSuspects, setAnalyzedSuspects] = useState({});
+  
+  // Estado persistente del interrogatorio por sospechoso
+  const [interrogationProgress, setInterrogationProgress] = useState({});
 
   useEffect(() => {
     getCaseById(caseId)
@@ -49,13 +54,28 @@ export default function InvestigationDashboard() {
     registerAction(caseId, `Sección consultada: ${tab}`);
   };
 
-  const handleInterrogate = (suspect) => {
-    logAction(`Interrogatorio a: ${suspect.name}`);
-    registerAction(caseId, `Interrogatorio a: ${suspect.name}`);
+  const handleUpdateProgress = (suspectId, progressData) => {
+    setInterrogationProgress((prev) => ({
+      ...prev,
+      [suspectId]: progressData
+    }));
+  };
+
+  const handleInterrogate = (suspect, customAction) => {
+    const text = customAction || `Interrogatorio a: ${suspect.name}`;
+    logAction(text);
+    registerAction(caseId, text);
   };
 
   const handleAnalyzeSuspect = (suspect) => {
-    setAnalyzedSuspects((prev) => ({ ...prev, [suspect.id]: true }));
+    setInterrogationProgress((prev) => ({
+      ...prev,
+      [suspect.id]: {
+        askedQuestions: { alibi: true, motive: true, means: true, confront: true },
+        fullyAnalyzed: true,
+        expanded: true
+      }
+    }));
     logAction(`Inferencia en Prolog: ${suspect.name} -> Nivel de sospecha: ${suspect.suspicionLevel}%`);
     registerAction(caseId, `Inferencia en Prolog: ${suspect.name} -> Nivel de sospecha: ${suspect.suspicionLevel}%`);
   };
@@ -85,7 +105,12 @@ export default function InvestigationDashboard() {
         <div className={styles.suspicionSection}>
           <h4>Nivel de Sospecha</h4>
           {caseData.suspects.map((s) => {
-            const isAnalyzed = analyzedSuspects[s.id];
+            const p = interrogationProgress[s.id] || {};
+            const score = getSuspectCurrentScore(s, p.askedQuestions, p.fullyAnalyzed);
+            const isRevealed = score !== null;
+            const pct = isRevealed ? score : 0;
+            const color = pct >= 70 ? "#f44336" : pct >= 40 ? "#ff9800" : "#4caf50";
+
             return (
               <div key={s.id} className={styles.suspBar}>
                 <span className={styles.suspName}>{s.name.split(" ")[0]}</span>
@@ -93,12 +118,14 @@ export default function InvestigationDashboard() {
                   <div
                     className={styles.barFill}
                     style={{
-                      width: isAnalyzed ? `${s.suspicionLevel}%` : "0%",
-                      background: s.suspicionLevel >= 70 ? "#f44336" : s.suspicionLevel >= 40 ? "#ff9800" : "#4caf50"
+                      width: isRevealed ? `${pct}%` : "0%",
+                      background: isRevealed ? color : "transparent"
                     }}
                   />
                 </div>
-                <span className={styles.suspPct}>{isAnalyzed ? `${s.suspicionLevel}%` : "??%"}</span>
+                <span className={styles.suspPct} style={{ color: isRevealed ? color : "var(--text-muted)" }}>
+                  {isRevealed ? `${pct}%` : "?%"}
+                </span>
               </div>
             );
           })}
@@ -157,7 +184,9 @@ export default function InvestigationDashboard() {
                 {caseData.suspects.map((s) => (
                   <SuspectCard 
                     key={s.id} 
-                    suspect={s} 
+                    suspect={s}
+                    progress={interrogationProgress[s.id] || {}}
+                    onUpdateProgress={handleUpdateProgress}
                     onInterrogate={handleInterrogate} 
                     onAnalyze={handleAnalyzeSuspect} 
                   />
@@ -267,7 +296,24 @@ export default function InvestigationDashboard() {
 
         {/* Bottom actions */}
         <div className={styles.bottomBar}>
-          <button className={styles.accuseBtn} onClick={() => { setShowAccuse(true); logAction("Acusación iniciada"); registerAction(caseId, "Acusación iniciada"); }}>
+          <button 
+            className={styles.reportBtn} 
+            onClick={() => { 
+              setShowReport(true); 
+              logAction("Informe pericial consultado"); 
+              registerAction(caseId, "Informe pericial consultado"); 
+            }}
+          >
+            Generar Informe Pericial
+          </button>
+          <button 
+            className={styles.accuseBtn} 
+            onClick={() => { 
+              setShowAccuse(true); 
+              logAction("Acusación iniciada"); 
+              registerAction(caseId, "Acusación iniciada"); 
+            }}
+          >
             Emitir Acusación Final
           </button>
         </div>
@@ -278,6 +324,19 @@ export default function InvestigationDashboard() {
           caseData={caseData}
           onClose={() => setShowAccuse(false)}
           onLog={logAction}
+          onViewReport={(res) => {
+            setLastAccusationResult(res);
+            setShowReport(true);
+          }}
+        />
+      )}
+
+      {showReport && (
+        <CaseReportModal
+          caseData={caseData}
+          log={log}
+          onClose={() => setShowReport(false)}
+          accusationResult={lastAccusationResult}
         />
       )}
     </div>
