@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 from typing import List, Dict, Any
 
@@ -29,6 +29,11 @@ class PrologService:
             from pyswip import Prolog
             self.prolog = Prolog()
             normalized_path = self.prolog_file_path.replace('\\', '/')
+            prolog_dir = os.path.dirname(normalized_path)
+            try:
+                list(self.prolog.query(f"working_directory(_, '{prolog_dir}')"))
+            except Exception:
+                pass
             self.prolog.consult(normalized_path)
             self.use_pyswip = True
             print(f"[PrologService] PySwip cargado exitosamente desde {normalized_path}")

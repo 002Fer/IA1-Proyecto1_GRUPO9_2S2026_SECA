@@ -1,0 +1,350 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+  backdrop-filter: blur(5px);
+}
+
+.modal {
+  background: #111420;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.controlsBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1.4rem;
+  background: #181c2c;
+  border-bottom: 1px solid var(--border);
+}
+
+.printBtn {
+  background: #3b82f6;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.printBtn:hover {
+  background: #2563eb;
+}
+
+.closeBtn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  border: 1px solid var(--border);
+  padding: 0.45rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.printableDocument {
+  padding: 2rem 2.5rem;
+  overflow-y: auto;
+  color: #e2e8f0;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.reportHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.deptBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #60a5fa;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.reportTitle {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin: 0.2rem 0;
+  color: #f8fafc;
+}
+
+.caseSub {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.metaBox {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.7rem 1rem;
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.sectionTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #93c5fd;
+  margin: 0;
+  border-bottom: 1px solid rgba(147, 197, 253, 0.2);
+  padding-bottom: 0.3rem;
+}
+
+.subTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  margin: 0 0 0.4rem 0;
+}
+
+.narrativeText {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+}
+
+.table th, .table td {
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.table th {
+  background: rgba(255, 255, 255, 0.04);
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.tagValid {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.tagInvalid {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.twoCols {
+  display: grid;
+  grid-templateColumns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.list {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.verdictBox {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: 6px;
+  padding: 1rem;
+  font-size: 0.88rem;
+}
+
+.verdictHeader {
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+}
+
+.textSuccess { color: #4ade80; font-weight: 700; }
+.textDanger { color: #f87171; font-weight: 700; }
+
+.rulesList {
+  margin: 0.5rem 0 0 1.2rem;
+  font-size: 0.82rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.rulesList code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  color: #93c5fd;
+  font-family: monospace;
+}
+
+.logTableWrap {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.logTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.logTable th, .logTable td {
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.logTable th {
+  background: rgba(255, 255, 255, 0.04);
+  color: #94a3b8;
+  position: sticky;
+  top: 0;
+}
+
+.logTimeCell {
+  color: #94a3b8;
+  font-family: monospace;
+  font-size: 0.78rem;
+}
+
+.emptyLog {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.signatures {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+}
+
+.signLine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.signBorder {
+  width: 200px;
+  border-bottom: 1px dashed #64748b;
+}
+
+/* Reglas de Impresión para PDF / Papel */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #informe-caso, #informe-caso * {
+    visibility: visible;
+  }
+  .overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    background: transparent !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+  .modal {
+    border: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+  }
+  .controlsBar {
+    display: none !important;
+  }
+  .printableDocument {
+    padding: 0 !important;
+    color: #111827 !important;
+  }
+  .reportTitle, .deptBadge, .caseSub, .sectionTitle, .subTitle {
+    color: #111827 !important;
+  }
+  .metaBox, .verdictBox {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #111827 !important;
+  }
+  .table th, .logTable th {
+    background: #f1f5f9 !important;
+    color: #334155 !important;
+  }
+  .table td, .logTable td {
+    border-bottom: 1px solid #e2e8f0 !important;
+    color: #111827 !important;
+  }
+  .rulesList code {
+    background: #f1f5f9 !important;
+    color: #1e3a8a !important;
+  }
+  .logTableWrap {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}

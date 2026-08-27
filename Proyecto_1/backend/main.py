@@ -1,10 +1,10 @@
-﻿from fastapi import FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import contradicciones, responsabilidad3
+from app.routers import contradicciones, responsabilidad1, responsabilidad3, admin
 
 app = FastAPI(
     title="Logic Detective API",
-    description="Motor de Inferencia para Investigaciones Criminales usando Prolog y Python (Responsabilidad 4)",
+    description="Motor de Inferencia para Investigaciones Criminales usando Prolog y Python",
     version="1.0.0"
 )
 
@@ -20,6 +20,8 @@ app.add_middleware(
 # Registrar Routers
 app.include_router(responsabilidad3.router)
 app.include_router(contradicciones.router)
+app.include_router(responsabilidad1.router)
+app.include_router(admin.router)
 
 @app.get("/", tags=["Health Check"])
 def read_root():

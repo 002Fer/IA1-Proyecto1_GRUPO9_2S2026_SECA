@@ -6,11 +6,14 @@ import styles from "./Home.module.css";
 const difficultyColor = { Facil: "#4caf50", Medio: "#ff9800", Dificil: "#f44336" };
 
 export default function Home() {
-  const { cases, selectCase } = useGame();
+  const { cases, selectCase, refreshCases } = useGame();
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
 
-  useEffect(() => { setTimeout(() => setVisible(true), 100); }, []);
+  useEffect(() => { 
+    setTimeout(() => setVisible(true), 100); 
+    refreshCases();
+  }, [refreshCases]);
 
   const handleStart = (c) => {
     selectCase(c);
@@ -35,7 +38,6 @@ export default function Home() {
         </div>
         <div className={styles.heroArt}>
           <div className={styles.orb}></div>
-          <div className={styles.magnify}>🔍</div>
         </div>
       </section>
 
@@ -44,12 +46,12 @@ export default function Home() {
         <h2 className={styles.sectionTitle}>¿Cómo funciona?</h2>
         <div className={styles.stepsGrid}>
           {[
-            { icon: "🕵️", title: "Investiga", desc: "Interroga sospechosos, examina evidencias y visita lugares." },
-            { icon: "🧠", title: "Analiza", desc: "El motor Prolog infiere relaciones, contradicciones y motivos." },
-            { icon: "⚖️", title: "Acusa", desc: "Emite tu acusación fundamentada con las reglas lógicas activadas." },
+            { step: "01", title: "Investiga", desc: "Interroga sospechosos, examina evidencias y visita lugares." },
+            { step: "02", title: "Analiza", desc: "El motor Prolog infiere relaciones, contradicciones y motivos." },
+            { step: "03", title: "Acusa", desc: "Emite tu acusación fundamentada con las reglas lógicas activadas." },
           ].map((s) => (
             <div key={s.title} className={styles.stepCard}>
-              <span className={styles.stepIcon}>{s.icon}</span>
+              <span className={styles.stepIcon}>{s.step}</span>
               <h3>{s.title}</h3>
               <p>{s.desc}</p>
             </div>
@@ -75,8 +77,8 @@ export default function Home() {
               <h3 className={styles.caseTitle}>{c.title}</h3>
               <p className={styles.caseDesc}>{c.description.slice(0, 120)}...</p>
               <div className={styles.caseMeta}>
-                <span>🕵️ {c.suspectsCount ?? c.suspects?.length ?? 0} sospechosos</span>
-                <span>🔎 {c.evidenceCount ?? c.evidence?.length ?? 0} evidencias</span>
+                <span>{c.suspectsCount ?? c.suspects?.length ?? 0} sospechosos</span>
+                <span>{c.evidenceCount ?? c.evidence?.length ?? 0} evidencias</span>
               </div>
               <button className={styles.caseBtn} onClick={() => handleStart(c)}>
                 Iniciar Investigación →

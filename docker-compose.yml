@@ -1,0 +1,24 @@
+services:
+  backend:
+    build:
+      context: ./Proyecto_1/backend
+      dockerfile: Dockerfile
+    container_name: logic_detective_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./Proyecto_1/frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+    container_name: logic_detective_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
