@@ -1,17 +1,34 @@
-﻿import cases from "../assets/mocks/cases.json";
+import cases from "../assets/mocks/cases.json";
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
+async function request(path, options = {}) {
+  const response = await fetch(`${API_BASE}${path}`, {
+    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    ...options,
+  });
+  if (!response.ok) {
+    let detail = "Error de comunicación con el servidor";
+    try { detail = (await response.json()).error || detail; } catch (_) { /* noop */ }
+    throw new Error(detail);
+  }
+  return response.json();
+}
+
 export async function getCases() {
-  await delay(300);
-  return cases;
+  try { return await request("/cases"); }
+  catch (_) { await delay(150); return cases; }
 }
 
 export async function getCaseById(id) {
-  await delay(200);
-  const c = cases.find((c) => c.id === id);
-  if (!c) throw new Error("Case not found");
-  return c;
+  try { return await request(`/cases/${id}`); }
+  catch (_) {
+    await delay(100);
+    const c = cases.find((item) => item.id === id);
+    if (!c) throw new Error("Case not found");
+    return c;
+  }
 }
 
 export async function getSuspects(caseId) {
@@ -39,44 +56,73 @@ export async function getContradictions(caseId) {
   return c.contradictions;
 }
 
+export async function getAlibis(caseId) { return request(`/cases/${caseId}/alibis`); }
+export async function getWitnesses(caseId) { return request(`/cases/${caseId}/witnesses`); }
+export async function getCameras(caseId) { return request(`/cases/${caseId}/cameras`); }
+export async function getAccessRecords(caseId) { return request(`/cases/${caseId}/access`); }
+export async function getTestimonies(caseId) { return request(`/cases/${caseId}/testimonies`); }
+export async function getClues(caseId) { return request(`/cases/${caseId}/clues`); }
+
 export async function getHint(caseId) {
-  await delay(400);
-  const hints = [
-    "Busca contradicciones entre las declaraciones y las evidencias fisicas.",
-    "El registro del ascensor revela movimientos que algunos niegan.",
-    "Las coartadas invalidas son la clave. Verifica quien miente.",
-    "Examina las motivaciones economicas de cada sospechoso.",
-    "Busca quien tenia los medios tecnicos para cometer el crimen.",
-  ];
-  return hints[Math.floor(Math.random() * hints.length)];
+  const clues = await getClues(caseId);
+  if (!clues.length) return "Revisa las coartadas y compáralas con los registros de acceso.";
+  const clue = clues[Math.floor(Math.random() * clues.length)];
+  return `Pista: revisa el evento de las ${clue.time}: ${clue.clue}`;
 }
 
 export async function interrogate(caseId, suspectId) {
-  await delay(500);
-  const c = await getCaseById(caseId);
-  const suspect = c.suspects.find((s) => s.id === suspectId);
-  if (!suspect) throw new Error("Suspect not found");
-  const randomStatement =
-    suspect.statements[Math.floor(Math.random() * suspect.statements.length)];
-  return { suspect: suspect.name, response: randomStatement };
-}
-
-export async function accuse(caseId, suspectId) {
-  await delay(600);
-  const c = await getCaseById(caseId);
-  const correct = c.culprit === suspectId;
-  const culprit = c.suspects.find((s) => s.id === c.culprit);
+  const testimonies = await getTestimonies(caseId);
+  const mine = testimonies.filter((t) => t.suspectId === suspectId);
   return {
-    correct,
-    culprit: culprit.name,
-    message: correct
-      ? "Felicitaciones. Has resuelto el caso correctamente."
-      : `Incorrecto. El verdadero culpable era ${culprit.name}.`,
-    explanation: c.rules,
+    suspect: mine[0]?.suspectName || suspectId,
+    response: mine.map((t) => t.statement),
   };
 }
 
-export async function getExplanation(caseId) {
-  const c = await getCaseById(caseId);
-  return c.rules;
+export async function accuse(caseId, suspectId) {
+  return request(`/cases/${caseId}/accuse`, {
+    method: "POST",
+    body: JSON.stringify({ suspectId }),
+  });
 }
+
+export async function getExplanation(caseId, suspectId) {
+  return request(`/cases/${caseId}/explanation/${suspectId}`);
+}
+
+export async function registerAction(caseId, action) {
+  try {
+    return await request("/log", {
+      method: "POST",
+      body: JSON.stringify({ caseId, action }),
+    });
+  } catch (_) {
+    return { ok: false, timestamp: new Date().toISOString() };
+  }
+}
+
+export async function getInvestigationLog(caseId) {
+  try { return await request(`/log/${caseId}`); }
+  catch (_) { return []; }
+}
+
+export async function createAdminCase(caseData) {
+  return request("/admin/cases", {
+    method: "POST",
+    body: JSON.stringify(caseData),
+  });
+}
+
+export async function updateAdminCase(caseId, caseData) {
+  return request(`/admin/cases/${caseId}`, {
+    method: "PUT",
+    body: JSON.stringify(caseData),
+  });
+}
+
+export async function deleteAdminCase(caseId) {
+  return request(`/admin/cases/${caseId}`, {
+    method: "DELETE",
+  });
+}
+

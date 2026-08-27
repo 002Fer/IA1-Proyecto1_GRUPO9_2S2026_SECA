@@ -1,5 +1,5 @@
-﻿import React, { createContext, useContext, useReducer, useEffect } from "react";
-import cases from "../assets/mocks/cases.json";
+import React, { createContext, useContext, useReducer, useEffect, useCallback } from "react";
+import { getCases } from "../utils/api.js";
 
 const GameContext = createContext(null);
 
@@ -15,7 +15,7 @@ const initialState = {
 function reducer(state, action) {
   switch (action.type) {
     case "SET_CASES":
-      return { ...state, cases: action.payload };
+      return { ...state, cases: action.payload, loading: false };
     case "SELECT_CASE":
       return { ...state, selectedCase: action.payload, log: [] };
     case "LOG_ACTION":
@@ -45,9 +45,21 @@ function reducer(state, action) {
 export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  useEffect(() => {
-    dispatch({ type: "SET_CASES", payload: cases });
+  const refreshCases = useCallback(async () => {
+    dispatch({ type: "SET_LOADING", payload: true });
+    try {
+      const data = await getCases();
+      dispatch({ type: "SET_CASES", payload: data });
+      return data;
+    } catch (err) {
+      dispatch({ type: "SET_ERROR", payload: err.message });
+      return [];
+    }
   }, []);
+
+  useEffect(() => {
+    refreshCases();
+  }, [refreshCases]);
 
   const logAction = (text) => dispatch({ type: "LOG_ACTION", payload: text });
   const selectCase = (c) => dispatch({ type: "SELECT_CASE", payload: c });
@@ -55,7 +67,7 @@ export function GameProvider({ children }) {
     dispatch({ type: "SET_SUSPICION", suspectId, level });
 
   return (
-    <GameContext.Provider value={{ ...state, dispatch, logAction, selectCase, setSuspicion }}>
+    <GameContext.Provider value={{ ...state, dispatch, logAction, selectCase, setSuspicion, refreshCases }}>
       {children}
     </GameContext.Provider>
   );
