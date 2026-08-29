@@ -221,6 +221,14 @@ def create_case(case: CaseCreate):
     }
 
 
+class CaseUpdate(BaseModel):
+    title: str
+    description: str
+    difficulty: str = "Facil"
+    suspects: Optional[List[SuspectItem]] = None
+    evidence: Optional[List[EvidenceItem]] = None
+    places: Optional[List[PlaceItem]] = None
+
 @router.put("/cases/{case_id}")
 def update_case(case_id: str, case: CaseUpdate):
     existente = prolog_service.query_once(f"caso({prolog_service.q(case_id)},_,_,_)")
@@ -231,14 +239,100 @@ def update_case(case_id: str, case: CaseUpdate):
     q = f"actualizar_caso({prolog_service.q(case_id)}, {prolog_service.q(case.title)}, {prolog_service.q(case.description)}, {dif_pl})"
     prolog_service.query_all(q)
     
+    # Si se envían sospechosos, evidencias o lugares actualizados
+    if case.suspects is not None or case.evidence is not None or case.places is not None:
+        # Limpiar hechos asociados del caso
+        prolog_service.query_all(f"retractall(persona({prolog_service.q(case_id)},_,_,_))")
+        prolog_service.query_all(f"retractall(motivo({prolog_service.q(case_id)},_,_))")
+        prolog_service.query_all(f"retractall(herramienta({prolog_service.q(case_id)},_,_))")
+        prolog_service.query_all(f"retractall(posee_herramienta({prolog_service.q(case_id)},_,_))")
+        prolog_service.query_all(f"retractall(evidencia({prolog_service.q(case_id)},_,_,_,_))")
+        prolog_service.query_all(f"retractall(evidencia_relacionada({prolog_service.q(case_id)},_,_))")
+        prolog_service.query_all(f"retractall(declaracion({prolog_service.q(case_id)},_,_,_,_))")
+        prolog_service.query_all(f"retractall(lugar({prolog_service.q(case_id)},_,_))")
+        prolog_service.query_all(f"retractall(coartada({prolog_service.q(case_id)},_,_,_,_))")
+        prolog_service.query_all(f"retractall(testimonio({prolog_service.q(case_id)},_,_,_))")
+        prolog_service.query_all(f"retractall(contradiccion({prolog_service.q(case_id)},_,_,_))")
+        prolog_service.query_all(f"retractall(linea_tiempo({prolog_service.q(case_id)},_,_,_))")
+        prolog_service.query_all(f"retractall(testigo({prolog_service.q(case_id)},_,_,_,_))")
+        prolog_service.query_all(f"retractall(camara({prolog_service.q(case_id)},_,_,_,_,_))")
+        prolog_service.query_all(f"retractall(registro_acceso({prolog_service.q(case_id)},_,_,_,_,_))")
+        prolog_service.query_all(f"retractall(perfil({prolog_service.q(case_id)},_,_,_,_))")
+        
+        suspect_ids = []
+        culprits = []
+        for idx, s in enumerate(case.suspects or []):
+            sid = s.id or f"suspect-{case_id}-{idx+1}"
+            suspect_ids.append(sid)
+            alibi_txt = s.alibi or f"Afirma no haber estado en la escena del crimen."
+            has_motive = s.motive and s.motive != "ninguno"
+            has_means = s.means and s.means != "ninguno"
+            is_culprit_profile = has_motive and has_means
+            if is_culprit_profile:
+                culprits.append(sid)
+            
+            prolog_service.query_all(f"crear_persona({prolog_service.q(case_id)}, {prolog_service.q(sid)}, {prolog_service.q(s.name)}, sospechoso)")
+            prolog_service.query_all(f"assertz(perfil({prolog_service.q(case_id)}, {prolog_service.q(sid)}, 35, {prolog_service.q(s.role or 'Sospechoso')}, {prolog_service.q(f'Persona involucrada en la investigación ({s.role}).')}))")
+            prolog_service.query_all(f"assertz(testimonio({prolog_service.q(case_id)}, {prolog_service.q(sid)}, {prolog_service.q(alibi_txt)}, declaracion_sospechoso))")
+            prolog_service.query_all(f"assertz(declaracion({prolog_service.q(case_id)}, {prolog_service.q(sid)}, {prolog_service.q(alibi_txt)}, '20:00', '23:59', 'fuera_escena'))")
+            alibi_valid_flag = "false" if is_culprit_profile else "true"
+            prolog_service.query_all(f"assertz(coartada({prolog_service.q(case_id)}, {prolog_service.q(sid)}, {prolog_service.q(alibi_txt)}, {alibi_valid_flag}, coartada_registrada))")
+            if has_motive:
+                prolog_service.query_all(f"crear_motivo({prolog_service.q(case_id)}, {prolog_service.q(sid)}, {s.motive})")
+            if has_means:
+                prolog_service.query_all(f"crear_herramienta({prolog_service.q(case_id)}, {s.means}, acceso)")
+                prolog_service.query_all(f"asignar_herramienta({prolog_service.q(case_id)}, {prolog_service.q(sid)}, {s.means})")
+
+        for idx, e in enumerate(case.evidence or []):
+            eid = e.id or f"ev-{case_id}-{idx+1}"
+            prolog_service.query_all(f"crear_evidencia({prolog_service.q(case_id)}, {prolog_service.q(eid)}, {e.type}, {prolog_service.q(e.description)}, {prolog_service.q(e.place)})")
+            target_suspect = culprits[0] if culprits else (suspect_ids[idx % len(suspect_ids)] if suspect_ids else None)
+            if target_suspect:
+                prolog_service.query_all(f"assertz(evidencia_relacionada({prolog_service.q(case_id)}, {prolog_service.q(eid)}, {prolog_service.q(target_suspect)}))")
+
+        for c_id in culprits:
+            prolog_service.query_all(f"assertz(contradiccion({prolog_service.q(case_id)}, {prolog_service.q('Afirma no haber estado en el lugar de los hechos')}, {prolog_service.q('Evidencias y registros perimetrales sitúan su presencia en la escena')}, {prolog_service.q(c_id)}))")
+
+        for idx, p in enumerate(case.places or []):
+            pid = p.id or f"pl-{case_id}-{idx+1}"
+            lugar_desc = f"{p.name}: {p.description}" if p.description else p.name
+            prolog_service.query_all(f"assertz(lugar({prolog_service.q(case_id)}, {prolog_service.q(pid)}, {prolog_service.q(lugar_desc)}))")
+            cid = f"cam-{case_id}-{idx+1}"
+            prolog_service.query_all(f"assertz(camara({prolog_service.q(case_id)}, {prolog_service.q(cid)}, {prolog_service.q(p.name)}, '20:00', '23:59', {prolog_service.q('Grabación perimetral activa')}))")
+            tid = f"testigo-{case_id}-{idx+1}"
+            target_s = suspect_ids[idx % len(suspect_ids)] if suspect_ids else "desconocido"
+            prolog_service.query_all(f"assertz(testigo({prolog_service.q(case_id)}, {prolog_service.q(tid)}, {prolog_service.q(f'Testigo de {p.name}')}, {prolog_service.q(f'Observó movimientos sospechosos cerca de {p.name}')}, {prolog_service.q(target_s)}))")
+            hora = f"2{idx%4}:15"
+            prolog_service.query_all(f"assertz(registro_acceso({prolog_service.q(case_id)}, {prolog_service.q(target_s)}, {prolog_service.q(p.name)}, {prolog_service.q(hora)}, {prolog_service.q(cid)}, {prolog_service.q('presencia_registrada')}))")
+
+        timeline_events = [
+            ("18:00", f"Inicio de operaciones regulares en {case.title}.", "false"),
+            ("20:30", "Se registra movimiento inusual y corte intermitente de cámaras.", "true"),
+            ("22:15", "Ocurre el incidente principal del caso en el área restringida.", "true"),
+            ("23:45", "Se activa la alarma y se descubre la evidencia en la escena.", "true"),
+            ("06:00", "Llega el equipo de investigación para analizar los hechos.", "false")
+        ]
+        for h, ev, susp in timeline_events:
+            prolog_service.query_all(f"assertz(linea_tiempo({prolog_service.q(case_id)}, {prolog_service.q(h)}, {prolog_service.q(ev)}, {susp}))")
+
+        # Persistir archivos
+        prolog_service.query_all("guardar_casos")
+        prolog_service.query_all("guardar_motivos_medios")
+        prolog_service.query_all("guardar_evidencias")
+        prolog_service.query_all("guardar_relaciones_evidencia")
+        prolog_service.query_all("guardar_declaraciones")
+
     return {
         "success": True,
-        "message": f"Caso '{case_id}' actualizado exitosamente.",
+        "message": f"Caso '{case_id}' actualizado exitosamente en Prolog.",
         "case": {
             "id": case_id,
             "title": case.title,
             "description": case.description,
-            "difficulty": case.difficulty
+            "difficulty": case.difficulty,
+            "suspectsCount": len(case.suspects or []) if case.suspects is not None else None,
+            "evidenceCount": len(case.evidence or []) if case.evidence is not None else None,
+            "placesCount": len(case.places or []) if case.places is not None else None
         }
     }
 

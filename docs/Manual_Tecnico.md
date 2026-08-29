@@ -64,7 +64,7 @@ El sistema sigue una arquitectura desacoplada de tres capas orquestada mediante 
 
 ---
 
-## 4. DICCIONARIO EXHAUSTIVO DE REGLAS DE INFERENCIA EN PROLOG
+## 4. DICCIONARIO DE REGLAS DE INFERENCIA EN PROLOG
 
 El motor se compone de más de **40 reglas lógicas** estructuradas en los siguientes módulos:
 
@@ -247,12 +247,12 @@ eliminar_caso(Id) :-
   * **Respuesta (200 OK):** Detalle completo con listas de `suspects`, `evidence`, `places`, `timeline`, `contradictions` y `rules`.
 
 ### 6.2 Peritajes y Líneas de Investigación
-* `GET /api/cases/{case_id}/cameras` ➔ Listado de cámaras con horarios de grabación y observaciones.
-* `GET /api/cases/{case_id}/access` ➔ Registros biométricos y de tarjetas magnéticas.
-* `GET /api/cases/{case_id}/witnesses` ➔ Declaraciones de testigos presenciales.
-* `GET /api/cases/{case_id}/clues` ➔ Pistas dinámicas generadas desde los eventos cronológicos del motor.
-* `GET /api/contradicciones/{case_id}` ➔ Incongruencias lógicas detectadas entre declaraciones y pruebas.
-* `GET /api/complices/{case_id}/{suspect_id}` ➔ Red de complicidad deducida mediante relaciones previas.
+* `GET /api/cases/{case_id}/cameras` -> Listado de cámaras con horarios de grabación y observaciones.
+* `GET /api/cases/{case_id}/access` -> Registros biométricos y de tarjetas magnéticas.
+* `GET /api/cases/{case_id}/witnesses` -> Declaraciones de testigos presenciales.
+* `GET /api/cases/{case_id}/clues` -> Pistas dinámicas generadas desde los eventos cronológicos del motor.
+* `GET /api/casos/{case_id}/contradicciones` -> Incongruencias lógicas detectadas entre declaraciones y pruebas.
+* `GET /api/casos/{case_id}/complices` -> Red de complicidad deducida mediante relaciones previas.
 
 ### 6.3 Resolución y Acusación
 * `POST /api/cases/{case_id}/accuse`
@@ -276,8 +276,9 @@ eliminar_caso(Id) :-
     ```
 
 ### 6.4 Módulo Administrativo
-* `POST /api/admin/cases` ➔ Recibe `CaseCreate` con listas de sospechosos, móviles, medios, evidencias y lugares, asertándolos en Prolog y persistiendo los archivos.
-* `DELETE /api/admin/cases/{case_id}` ➔ Ejecuta `eliminar_caso/1` y limpia la base de hechos en memoria y disco.
+* `POST /api/admin/cases` -> Recibe `CaseCreate` con listas de sospechosos, móviles, medios, evidencias y lugares, asertándolos en Prolog y persistiendo los archivos.
+* `PUT /api/admin/cases/{case_id}` -> Recibe `CaseUpdate` con los datos modificados del caso y actualiza los hechos en Prolog (`actualizar_caso/4`).
+* `DELETE /api/admin/cases/{case_id}` -> Ejecuta `eliminar_caso/1` y limpia la base de hechos en memoria y disco.
 
 ---
 
@@ -350,3 +351,67 @@ services:
       - backend
     restart: always
 ```
+
+---
+
+## 9. GUÍA DE EJECUCIÓN DEL PROYECTO
+
+Esta sección describe los pasos exactos para clonar, configurar y ejecutar **Logic Detective** en cualquier entorno (Windows, Linux, macOS o servidores en la nube) utilizando Docker y Docker Compose.
+
+### 9.1 Requisitos Previos
+* **Git:** Para clonar el repositorio de código.
+* **Docker y Docker Compose:**
+  * En **Windows / macOS:** Tener instalado y en ejecución Docker Desktop.
+  * En **Linux (Ubuntu/Debian):** Tener instalados los paquetes `docker.io` y `docker-compose-plugin` o `docker-compose`.
+
+---
+
+### 9.2 Pasos para Levantar el Proyecto con Docker
+
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/002Fer/IA1-Proyecto1_GRUPO9_2S2026_SECA
+   cd IA1-Proyecto1_GRUPO9_2S2026_SECA
+   ```
+
+2. **Construir y levantar los contenedores en segundo plano:**
+   ```bash
+   docker compose up -d --build
+   ```
+   Este comando descarga las imágenes base de Python y Node/Nginx, compila el frontend con Vite, instala SWI-Prolog y levanta ambos servicios en segundo plano.
+
+3. **Verificar el estado de los contenedores:**
+   ```bash
+   docker compose ps
+   ```
+   Ambos servicios `logic_detective_backend` y `logic_detective_frontend` deben mostrar estado `Up`.
+
+4. **Acceder a la aplicación:**
+   * **Frontend Web (Aplicación Detective):** [http://localhost](http://localhost) (o `http://<IP_DE_LA_MAQUINA>`)
+   * **Documentación Interactiva Backend (Swagger API):** [http://localhost:8000/docs](http://localhost:8000/docs)
+
+---
+
+### 9.3 Comandos Útiles para Gestión del Proyecto
+
+* **Ver los logs en tiempo real:**
+  ```bash
+  docker compose logs -f
+  ```
+* **Ver logs específicos del backend (FastAPI y Prolog):**
+  ```bash
+  docker compose logs -f backend
+  ```
+* **Ejecutar la suite de pruebas automatizadas (25 tests con Pytest):**
+  ```bash
+  docker compose run --rm backend pytest tests/ -v
+  ```
+* **Detener los servicios:**
+  ```bash
+  docker compose down
+  ```
+* **Reiniciar los servicios:**
+  ```bash
+  docker compose restart
+  ```
+
