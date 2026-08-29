@@ -260,6 +260,19 @@ class PrologService:
             for row in self.query_all(f"linea_tiempo({self.q(case_id)},Hora,Evento,Sospechoso)")
         ]
 
+        relations = []
+        for row in self.query_all(f"relacion_previa({self.q(case_id)},P1,P2,TipoRel)"):
+            p1_id = self.value(row["P1"])
+            p2_id = self.value(row["P2"])
+            tipo = self.value(row["TipoRel"])
+            relations.append({
+                "person1": p1_id,
+                "person1Name": self.person_name(case_id, p1_id),
+                "person2": p2_id,
+                "person2Name": self.person_name(case_id, p2_id),
+                "relationship": tipo.replace("_", " ").capitalize() if tipo else "Vínculo previo registrado"
+            })
+
         return {
             "id": case_id,
             "title": self.value(case["Titulo"]),
@@ -270,6 +283,7 @@ class PrologService:
             "places": places,
             "timeline": timeline,
             "contradictions": contradictions,
+            "relations": relations,
             "rules": [
                 "coartada_valida/2",
                 "coartada_invalida/2",

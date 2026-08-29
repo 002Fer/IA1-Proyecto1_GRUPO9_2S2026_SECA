@@ -28,13 +28,23 @@ def test_admin_create_and_delete_case():
     res_list = client.get("/api/admin/cases")
     ids = [c["id"] for c in res_list.json()]
     assert test_id in ids
+
+    # 3. Actualizar caso (PUT)
+    update_data = {
+        "title": "Caso de Prueba Modificado",
+        "description": "Nueva descripcion actualizada.",
+        "difficulty": "Medio"
+    }
+    res_update = client.put(f"/api/admin/cases/{test_id}", json=update_data)
+    assert res_update.status_code == 200
+    assert res_update.json()["success"] is True
     
-    # 3. Eliminar caso
+    # 4. Eliminar caso
     res_del = client.delete(f"/api/admin/cases/{test_id}")
     assert res_del.status_code == 200
     assert res_del.json()["success"] is True
     
-    # 4. Verificar que ya no esté
+    # 5. Verificar que ya no esté
     res_list_after = client.get("/api/admin/cases")
     ids_after = [c["id"] for c in res_list_after.json()]
     assert test_id not in ids_after

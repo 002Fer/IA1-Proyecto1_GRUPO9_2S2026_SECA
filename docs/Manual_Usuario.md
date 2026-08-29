@@ -54,6 +54,7 @@ El panel de investigación se divide en dos secciones principales:
   * **Coartadas:** Cuadro de coartadas evaluadas deductivamente por Prolog.
   * **Cámaras:** Grabaciones de seguridad y monitoreo perimetral.
   * **Accesos:** Registros de tarjetas maestras, cerraduras y biometría.
+  * **Relaciones:** Consulta de vínculos previos, relaciones y redes de complicidad entre personas del caso.
   * **Contradicciones:** Lista de contradicciones lógicas detectadas por Prolog entre declaraciones y pruebas.
   * **Pistas:** Sistema de pistas asistidas por el motor de IA.
 
@@ -123,8 +124,9 @@ El Panel Administrativo (`/admin`) permite gestionar la base de conocimiento de 
 
 ![Crear Caso](./image/Screenshot%202026-08-25%20223417.png)
 
-### 4.2 Investigar y Eliminar Casos
+### 4.2 Investigar, Editar y Eliminar Casos
 * **Investigar:** Haz clic en el botón **`Investigar`** de la tabla para abrir directamente el expediente en el panel de detective.
+* **Editar:** Haz clic en el botón **`Editar`** para abrir el formulario con los datos cargados del caso, permitiendo modificar su título, dificultad, descripción, sospechosos, evidencias y lugares, y guardar los cambios directamente en Prolog.
 * **Borrar:** Haz clic en el botón **`Borrar`** para eliminar el caso de la memoria y disco de Prolog (limpiando todos los hechos asociados de personas, evidencias, coartadas y registros sin dejar datos huérfanos).
 
 ![Investigar y Eliminar](./image/Screenshot%202026-08-25%20223337.png)

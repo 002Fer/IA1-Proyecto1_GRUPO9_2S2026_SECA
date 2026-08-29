@@ -119,12 +119,16 @@ export default function SuspectCard({ suspect, progress = {}, onUpdateProgress, 
           }}
         />
       </div>
-
       <div className={styles.badges}>
         {askedQuestions["alibi"] && (
-          <span className={`${styles.badge} ${suspect.alibiValid ? styles.valid : styles.invalid}`}>
-            {suspect.alibiValid ? "Coartada Válida" : "Coartada Desmentida"}
-          </span>
+          <>
+            <span className={`${styles.badge} ${suspect.alibiValid ? styles.valid : styles.invalid}`}>
+              {suspect.alibiValid ? "Coartada Válida" : "Coartada Desmentida"}
+            </span>
+            <span className={`${styles.badge} ${suspect.alibiValid ? styles.valid : styles.invalid}`}>
+              Oportunidad: {suspect.alibiValid ? "Descartada por coartada" : "Coincide con ventana horaria"}
+            </span>
+          </>
         )}
         {askedQuestions["motive"] && suspect.motive && (
           <span className={styles.badge}>Móvil: {suspect.motive}</span>
