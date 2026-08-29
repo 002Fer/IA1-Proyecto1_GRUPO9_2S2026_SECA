@@ -10,7 +10,7 @@ import AccusationModal from "../components/investigation/AccusationModal.jsx";
 import CaseReportModal from "../components/investigation/CaseReportModal.jsx";
 import styles from "./InvestigationDashboard.module.css";
 
-const TABS = ["Descripción", "Sospechosos", "Evidencias", "Lugares", "Cronología", "Testimonios", "Coartadas", "Cámaras", "Accesos", "Contradicciones", "Pistas"];
+const TABS = ["Descripción", "Sospechosos", "Evidencias", "Lugares", "Cronología", "Testimonios", "Coartadas", "Cámaras", "Accesos", "Relaciones", "Contradicciones", "Pistas"];
 
 export default function InvestigationDashboard() {
   const { caseId } = useParams();
@@ -27,8 +27,9 @@ export default function InvestigationDashboard() {
   const [loading, setLoading] = useState(true);
   const [investigationData, setInvestigationData] = useState({ witnesses: [], cameras: [], access: [], testimonies: [] });
   
-  // Estado persistente del interrogatorio por sospechoso
+  // Estado persistente del interrogatorio por sospechoso y testigos
   const [interrogationProgress, setInterrogationProgress] = useState({});
+  const [interrogatedWitnesses, setInterrogatedWitnesses] = useState({});
 
   useEffect(() => {
     getCaseById(caseId)
@@ -52,6 +53,13 @@ export default function InvestigationDashboard() {
     setActiveTab(tab);
     logAction(`Sección consultada: ${tab}`);
     registerAction(caseId, `Sección consultada: ${tab}`);
+  };
+
+  const handleInterrogateWitness = (w) => {
+    setInterrogatedWitnesses((prev) => ({ ...prev, [w.id]: true }));
+    const logMsg = `Interrogatorio al testigo: ${w.name} (Ref: ${w.suspectName || "Caso"})`;
+    logAction(logMsg);
+    registerAction(caseId, logMsg);
   };
 
   const handleUpdateProgress = (suspectId, progressData) => {
@@ -232,7 +240,67 @@ export default function InvestigationDashboard() {
 
           {activeTab === "Testimonios" && (
             <div className={styles.section}>
-              <h3>Testimonios registrados</h3>
+              <h3>Testigos Presenciales e Interrogatorios</h3>
+              
+              {investigationData.witnesses && investigationData.witnesses.length > 0 && (
+                <div style={{ marginBottom: "2rem" }}>
+                  <h4 style={{ color: "var(--primary)", fontSize: "0.95rem", marginBottom: "0.8rem" }}>
+                    Testigos Clave Identificados en la Escena:
+                  </h4>
+                  <div className={styles.testimonyList}>
+                    {investigationData.witnesses.map((w) => {
+                      const isInterrogated = interrogatedWitnesses[w.id];
+                      return (
+                        <div className={styles.testimonyCard} key={w.id} style={{ borderLeft: "4px solid #3b82f6" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <strong>{w.name}</strong>
+                            <span className={styles.meta}>Testigo Presencial</span>
+                          </div>
+                          {w.suspectName && (
+                            <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block", marginTop: "2px" }}>
+                              Declaración relativa a: <strong style={{ color: "#e2e8f0" }}>{w.suspectName}</strong>
+                            </span>
+                          )}
+                          
+                          {isInterrogated ? (
+                            <div style={{ marginTop: "0.6rem", background: "rgba(59, 130, 246, 0.08)", padding: "0.8rem", borderRadius: "6px", border: "1px solid rgba(59, 130, 246, 0.25)" }}>
+                              <p style={{ margin: 0, color: "#cbd5e1", fontStyle: "italic" }}>
+                                "{w.observation}"
+                              </p>
+                              <span style={{ display: "block", marginTop: "0.4rem", fontSize: "0.75rem", color: "#60a5fa", fontWeight: "600" }}>
+                                Declaración testimonial incorporada al expediente.
+                              </span>
+                            </div>
+                          ) : (
+                            <div style={{ marginTop: "0.6rem" }}>
+                              <button
+                                type="button"
+                                onClick={() => handleInterrogateWitness(w)}
+                                style={{
+                                  background: "rgba(59, 130, 246, 0.15)",
+                                  color: "#60a5fa",
+                                  border: "1px solid #3b82f6",
+                                  padding: "0.35rem 0.8rem",
+                                  borderRadius: "6px",
+                                  fontWeight: "600",
+                                  fontSize: "0.8rem",
+                                  cursor: "pointer"
+                                }}
+                              >
+                                Interrogar Testigo
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <h4 style={{ color: "var(--primary)", fontSize: "0.95rem", marginBottom: "0.8rem" }}>
+                Declaraciones Formales de Sospechosos:
+              </h4>
               <div className={styles.testimonyList}>
                 {investigationData.testimonies.map((t, i) => (
                   <div className={styles.testimonyCard} key={`${t.suspectId}-${i}`}>
@@ -272,6 +340,27 @@ export default function InvestigationDashboard() {
               <div className={styles.recordList}>
                 {investigationData.access.map((a, i) => <div className={styles.recordCard} key={`${a.suspectId}-${i}`}><strong>{a.suspectName}</strong><span>{a.time} · {a.location}</span><p>Fuente: {a.source} · Acción: {a.action}</p></div>)}
               </div>
+            </div>
+          )}
+
+          {activeTab === "Relaciones" && (
+            <div className={styles.section}>
+              <h3>Relaciones y Vínculos entre Involucrados</h3>
+              {caseData.relations && caseData.relations.length > 0 ? (
+                <div className={styles.recordList}>
+                  {caseData.relations.map((r, i) => (
+                    <div className={styles.recordCard} key={i}>
+                      <strong>{r.person1Name} y {r.person2Name}</strong>
+                      <span className={styles.meta}>Vínculo Registrado</span>
+                      <p>{r.relationship}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ color: "var(--text-muted)", fontStyle: "italic", marginTop: "1rem" }}>
+                  No se han registrado vínculos directos o relaciones previas entre los sospechosos de este caso.
+                </p>
+              )}
             </div>
           )}
 

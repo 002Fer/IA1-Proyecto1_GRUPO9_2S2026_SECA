@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCases, createAdminCase, deleteAdminCase } from "../utils/api.js";
+import { getCases, getCaseById, createAdminCase, updateAdminCase, deleteAdminCase } from "../utils/api.js";
 import { useGame } from "../context/GameContext.jsx";
 import styles from "./Admin.module.css";
 
@@ -62,6 +62,7 @@ export default function Admin() {
   const [casesList, setCasesList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingCaseId, setEditingCaseId] = useState(null);
   const [modalTab, setModalTab] = useState("info");
   const [search, setSearch] = useState("");
   const [statusMsg, setStatusMsg] = useState(null);
@@ -109,6 +110,71 @@ export default function Admin() {
     setTimeout(() => setStatusMsg(null), 4000);
   };
 
+  const handleOpenCreate = () => {
+    setEditingCaseId(null);
+    setNewCase({
+      title: "",
+      difficulty: "Facil",
+      description: "",
+      suspects: [
+        { name: "", role: "Principal Sospechoso", alibi: "", motive: "deudas_economicas", means: "llaves_maestras" },
+        { name: "", role: "Empleado del lugar", alibi: "", motive: "ninguno", means: "ninguno" },
+      ],
+      evidence: [{ description: "", type: "fisica", place: "Escena del crimen" }],
+      places: [{ name: "", description: "" }]
+    });
+    setShowForm(true);
+    setModalTab("info");
+  };
+
+  const handleOpenEdit = async (caseItem) => {
+    setEditingCaseId(caseItem.id);
+    try {
+      const full = await getCaseById(caseItem.id);
+      setNewCase({
+        title: full.title || caseItem.title,
+        difficulty: full.difficulty || caseItem.difficulty || "Facil",
+        description: full.description || caseItem.description || "",
+        suspects: full.suspects && full.suspects.length > 0
+          ? full.suspects.map((s) => ({
+              id: s.id,
+              name: s.name || "",
+              role: s.role || "Sospechoso",
+              alibi: s.alibi || "",
+              motive: s.motive || "ninguno",
+              means: s.means || "ninguno"
+            }))
+          : [{ name: "", role: "Sospechoso", alibi: "", motive: "ninguno", means: "ninguno" }],
+        evidence: full.evidence && full.evidence.length > 0
+          ? full.evidence.map((e) => ({
+              id: e.id,
+              type: e.type || "fisica",
+              description: e.description || "",
+              place: e.place || "Escena del crimen"
+            }))
+          : [{ description: "", type: "fisica", place: "Escena del crimen" }],
+        places: full.places && full.places.length > 0
+          ? full.places.map((p) => ({
+              id: p.id,
+              name: p.name || "",
+              description: p.description || ""
+            }))
+          : [{ name: "", description: "" }]
+      });
+    } catch (_) {
+      setNewCase({
+        title: caseItem.title,
+        difficulty: caseItem.difficulty || "Facil",
+        description: caseItem.description || "",
+        suspects: [{ name: "", role: "Sospechoso", alibi: "", motive: "ninguno", means: "ninguno" }],
+        evidence: [{ description: "", type: "fisica", place: "Escena del crimen" }],
+        places: [{ name: "", description: "" }]
+      });
+    }
+    setShowForm(true);
+    setModalTab("info");
+  };
+
   const handleCargarPlantilla = () => {
     setNewCase(JSON.parse(JSON.stringify(PLANTILLA_EJEMPLO)));
     showNotification("Plantilla de ejemplo cargada con indicios listos para Prolog.");
@@ -135,7 +201,7 @@ export default function Admin() {
     }));
   };
 
-  const handleCreate = async () => {
+  const handleSave = async () => {
     if (!newCase.title.trim() || !newCase.description.trim()) {
       showNotification("Por favor completa el título y la descripción del caso.", "error");
       setModalTab("info");
@@ -153,8 +219,13 @@ export default function Admin() {
         places: newCase.places.filter(p => p.name.trim().length > 0)
       };
 
-      await createAdminCase(payload);
-      showNotification("Caso creado exitosamente con sus reglas lógicas en Prolog.");
+      if (editingCaseId) {
+        await updateAdminCase(editingCaseId, payload);
+        showNotification(`Caso "${editingCaseId}" actualizado exitosamente en Prolog.`);
+      } else {
+        await createAdminCase(payload);
+        showNotification("Caso creado exitosamente con sus reglas lógicas en Prolog.");
+      }
       
       setNewCase({
         title: "",
@@ -169,11 +240,12 @@ export default function Admin() {
       });
 
       setShowForm(false);
+      setEditingCaseId(null);
       setModalTab("info");
       await fetchCases();
       if (refreshCases) await refreshCases();
     } catch (err) {
-      showNotification(err.message || "Error al crear el caso en Prolog", "error");
+      showNotification(err.message || "Error al procesar el caso en Prolog", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -204,10 +276,10 @@ export default function Admin() {
       <div className={styles.header}>
         <div>
           <h1>Panel Administrativo</h1>
-          <p className={styles.sub}>Gestión, creación y persistencia de casos e investigaciones en Prolog.</p>
+          <p className={styles.sub}>Gestión, creación, edición y persistencia de casos e investigaciones en Prolog.</p>
         </div>
         <div style={{ display: "flex", gap: "10px" }}>
-          <button className={styles.newBtn} onClick={() => { setShowForm(true); setModalTab("info"); }}>
+          <button className={styles.newBtn} onClick={handleOpenCreate}>
             + Nuevo Caso Estructurado
           </button>
         </div>
@@ -285,6 +357,13 @@ export default function Admin() {
                       Investigar
                     </button>
                     <button 
+                      className={`${styles.actionBtn} ${styles.editBtn}`}
+                      onClick={() => handleOpenEdit(c)}
+                      title="Editar caso en Prolog"
+                    >
+                      Editar
+                    </button>
+                    <button 
                       className={`${styles.actionBtn} ${styles.del}`}
                       onClick={() => handleDelete(c)}
                       title="Eliminar caso de Prolog"
@@ -301,28 +380,32 @@ export default function Admin() {
         </table>
       </div>
 
-      {/* Create modal with tabs & predefined options */}
+      {/* Create / Edit modal with tabs & predefined options */}
       {showForm && (
         <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && setShowForm(false)}>
           <div className={styles.modal} style={{ maxWidth: "680px", width: "95%" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-              <h2 style={{ margin: 0 }}>Nuevo Caso en Prolog</h2>
-              <button 
-                type="button" 
-                onClick={handleCargarPlantilla}
-                style={{ 
-                  background: "rgba(59, 130, 246, 0.15)", 
-                  color: "#60a5fa", 
-                  border: "1px solid #3b82f6", 
-                  padding: "6px 12px", 
-                  borderRadius: "6px", 
-                  cursor: "pointer", 
-                  fontWeight: "600",
-                  fontSize: "0.85rem"
-                }}
-              >
-                Cargar Plantilla de Ejemplo
-              </button>
+              <h2 style={{ margin: 0 }}>
+                {editingCaseId ? `Editar Caso: ${editingCaseId}` : "Nuevo Caso en Prolog"}
+              </h2>
+              {!editingCaseId && (
+                <button 
+                  type="button" 
+                  onClick={handleCargarPlantilla}
+                  style={{ 
+                    background: "rgba(59, 130, 246, 0.15)", 
+                    color: "#60a5fa", 
+                    border: "1px solid #3b82f6", 
+                    padding: "6px 12px", 
+                    borderRadius: "6px", 
+                    cursor: "pointer", 
+                    fontWeight: "600",
+                    fontSize: "0.85rem"
+                  }}
+                >
+                  Cargar Plantilla de Ejemplo
+                </button>
+              )}
             </div>
 
             {/* Modal Subtabs */}
@@ -373,52 +456,55 @@ export default function Admin() {
               </button>
             </div>
 
-            {/* Tab 1: Info */}
+            {/* TAB 1: INFO GENERAL */}
             {modalTab === "info" && (
-              <div>
-                <label>Título del Caso</label>
-                <input 
-                  className={styles.input} 
-                  value={newCase.title} 
-                  onChange={(e) => setNewCase({ ...newCase, title: e.target.value })} 
-                  placeholder="Ej: El Robo del Microchip Cuántico" 
-                />
-                
-                <label>Nivel de Dificultad</label>
-                <select 
-                  className={styles.input} 
-                  value={newCase.difficulty} 
-                  onChange={(e) => setNewCase({ ...newCase, difficulty: e.target.value })}
-                >
-                  <option value="Facil">Fácil</option>
-                  <option value="Medio">Medio</option>
-                  <option value="Dificil">Difícil</option>
-                </select>
-
-                <label>Descripción del Caso / Incidente</label>
-                <textarea 
-                  className={styles.input} 
-                  rows="4" 
-                  value={newCase.description} 
-                  onChange={(e) => setNewCase({ ...newCase, description: e.target.value })} 
-                  placeholder="Describe los acontecimientos principales del caso para el detective..." 
-                />
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <div>
+                  <label>Título del Caso *</label>
+                  <input
+                    className={styles.input}
+                    placeholder="Ej: El Robo del Siglo"
+                    value={newCase.title}
+                    onChange={(e) => setNewCase({ ...newCase, title: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label>Dificultad *</label>
+                  <select
+                    className={styles.input}
+                    value={newCase.difficulty}
+                    onChange={(e) => setNewCase({ ...newCase, difficulty: e.target.value })}
+                  >
+                    <option value="Facil">Fácil</option>
+                    <option value="Medio">Medio</option>
+                    <option value="Dificil">Difícil</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Descripción del Caso e Incidente *</label>
+                  <textarea
+                    className={styles.input}
+                    rows="4"
+                    placeholder="Describe los hechos ocurridos, la hora y el lugar del incidente..."
+                    value={newCase.description}
+                    onChange={(e) => setNewCase({ ...newCase, description: e.target.value })}
+                  />
+                </div>
               </div>
             )}
 
-            {/* Tab 2: Suspects con opciones estructuradas */}
+            {/* TAB 2: SOSPECHOSOS Y PERFILES */}
             {modalTab === "suspects" && (
-              <div style={{ maxHeight: "320px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "14px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxHeight: "360px", overflowY: "auto", paddingRight: "4px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Configura los sospechosos con sus indicios lógicos:</span>
-                  <button type="button" onClick={handleAddSuspect} style={{ padding: "4px 8px", fontSize: "0.8rem", cursor: "pointer" }}>+ Añadir Persona</button>
+                  <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Configura los sospechosos y sus móviles:</span>
+                  <button type="button" onClick={handleAddSuspect} style={{ padding: "4px 8px", fontSize: "0.8rem", cursor: "pointer" }}>+ Añadir Sospechoso</button>
                 </div>
                 {newCase.suspects.map((s, idx) => (
-                  <div key={idx} style={{ background: "rgba(255,255,255,0.03)", padding: "12px", borderRadius: "8px", border: "1px solid var(--border)" }}>
-                    <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+                  <div key={idx} style={{ background: "rgba(255,255,255,0.03)", padding: "12px", borderRadius: "8px", border: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                       <input 
                         className={styles.input} 
-                        style={{ flex: 2, marginBottom: 0 }}
                         placeholder="Nombre completo" 
                         value={s.name} 
                         onChange={(e) => {
@@ -429,8 +515,7 @@ export default function Admin() {
                       />
                       <input 
                         className={styles.input} 
-                        style={{ flex: 1, marginBottom: 0 }}
-                        placeholder="Rol / Ocupación" 
+                        placeholder="Rol u Ocupación" 
                         value={s.role} 
                         onChange={(e) => {
                           const updated = [...newCase.suspects];
@@ -439,113 +524,101 @@ export default function Admin() {
                         }} 
                       />
                     </div>
-
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "8px" }}>
+                    <input 
+                      className={styles.input} 
+                      placeholder="Declaración de coartada (¿Dónde afirma haber estado?)" 
+                      value={s.alibi} 
+                      onChange={(e) => {
+                        const updated = [...newCase.suspects];
+                        updated[idx].alibi = e.target.value;
+                        setNewCase({ ...newCase, suspects: updated });
+                      }} 
+                    />
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                       <div>
-                        <label style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "block", marginBottom: "2px" }}>Móvil / Motivo (Prolog)</label>
+                        <label style={{ fontSize: "0.75rem" }}>Móvil / Motivo (Prolog):</label>
                         <select 
-                          className={styles.input}
-                          style={{ marginBottom: 0, fontSize: "0.85rem" }}
-                          value={s.motive || "ninguno"}
+                          className={styles.input} 
+                          value={s.motive} 
                           onChange={(e) => {
                             const updated = [...newCase.suspects];
                             updated[idx].motive = e.target.value;
                             setNewCase({ ...newCase, suspects: updated });
                           }}
                         >
-                          {MOTIVOS_OPTIONS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                          {MOTIVOS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                         </select>
                       </div>
-
                       <div>
-                        <label style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "block", marginBottom: "2px" }}>Medios / Acceso (Prolog)</label>
+                        <label style={{ fontSize: "0.75rem" }}>Medios / Herramienta (Prolog):</label>
                         <select 
-                          className={styles.input}
-                          style={{ marginBottom: 0, fontSize: "0.85rem" }}
-                          value={s.means || "ninguno"}
+                          className={styles.input} 
+                          value={s.means} 
                           onChange={(e) => {
                             const updated = [...newCase.suspects];
                             updated[idx].means = e.target.value;
                             setNewCase({ ...newCase, suspects: updated });
                           }}
                         >
-                          {MEDIOS_OPTIONS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+                          {MEDIOS_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                         </select>
                       </div>
-                    </div>
-
-                    <div>
-                      <label style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "block", marginBottom: "2px" }}>Declaración / Coartada Alegada (Prolog evaluará su validez)</label>
-                      <input 
-                        className={styles.input} 
-                        style={{ marginBottom: 0, fontSize: "0.85rem" }}
-                        placeholder="Declaración del sospechoso sobre su ubicación durante el crimen..." 
-                        value={s.alibi} 
-                        onChange={(e) => {
-                          const updated = [...newCase.suspects];
-                          updated[idx].alibi = e.target.value;
-                          setNewCase({ ...newCase, suspects: updated });
-                        }} 
-                      />
                     </div>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Tab 3: Evidence con tipos estructurados */}
+            {/* TAB 3: EVIDENCIAS */}
             {modalTab === "evidence" && (
-              <div style={{ maxHeight: "320px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxHeight: "360px", overflowY: "auto", paddingRight: "4px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Evidencias e indicios clasificados:</span>
+                  <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Pruebas e indicios encontrados:</span>
                   <button type="button" onClick={handleAddEvidence} style={{ padding: "4px 8px", fontSize: "0.8rem", cursor: "pointer" }}>+ Añadir Evidencia</button>
                 </div>
                 {newCase.evidence.map((ev, idx) => (
-                  <div key={idx} style={{ background: "rgba(255,255,255,0.03)", padding: "10px", borderRadius: "6px", border: "1px solid var(--border)" }}>
-                    <div style={{ display: "flex", gap: "8px", marginBottom: "6px" }}>
-                      <input 
-                        className={styles.input} 
-                        style={{ flex: 2, marginBottom: 0 }}
-                        placeholder="Descripción de la evidencia" 
-                        value={ev.description} 
-                        onChange={(e) => {
-                          const updated = [...newCase.evidence];
-                          updated[idx].description = e.target.value;
-                          setNewCase({ ...newCase, evidence: updated });
-                        }} 
-                      />
+                  <div key={idx} style={{ background: "rgba(255,255,255,0.03)", padding: "10px", borderRadius: "6px", border: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <input 
+                      className={styles.input} 
+                      placeholder="Descripción de la evidencia pericial" 
+                      value={ev.description} 
+                      onChange={(e) => {
+                        const updated = [...newCase.evidence];
+                        updated[idx].description = e.target.value;
+                        setNewCase({ ...newCase, evidence: updated });
+                      }} 
+                    />
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                       <select 
                         className={styles.input} 
-                        style={{ flex: 1, marginBottom: 0, fontSize: "0.85rem" }}
                         value={ev.type} 
                         onChange={(e) => {
                           const updated = [...newCase.evidence];
                           updated[idx].type = e.target.value;
                           setNewCase({ ...newCase, evidence: updated });
-                        }} 
+                        }}
                       >
                         {TIPOS_EVIDENCIA.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                       </select>
+                      <input 
+                        className={styles.input} 
+                        placeholder="Lugar de hallazgo (Ej: Bóveda)" 
+                        value={ev.place} 
+                        onChange={(e) => {
+                          const updated = [...newCase.evidence];
+                          updated[idx].place = e.target.value;
+                          setNewCase({ ...newCase, evidence: updated });
+                        }} 
+                      />
                     </div>
-                    <input 
-                      className={styles.input} 
-                      style={{ marginBottom: 0, fontSize: "0.85rem" }}
-                      placeholder="Lugar donde se halló el indicio..." 
-                      value={ev.place} 
-                      onChange={(e) => {
-                        const updated = [...newCase.evidence];
-                        updated[idx].place = e.target.value;
-                        setNewCase({ ...newCase, evidence: updated });
-                      }} 
-                    />
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Tab 4: Places */}
+            {/* TAB 4: LUGARES */}
             {modalTab === "places" && (
-              <div style={{ maxHeight: "320px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxHeight: "360px", overflowY: "auto", paddingRight: "4px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Lugares relevantes en la escena:</span>
                   <button type="button" onClick={handleAddPlace} style={{ padding: "4px 8px", fontSize: "0.8rem", cursor: "pointer" }}>+ Añadir Lugar</button>
@@ -583,8 +656,8 @@ export default function Admin() {
               <button className={styles.cancelBtn} onClick={() => setShowForm(false)} disabled={isSubmitting}>
                 Cancelar
               </button>
-              <button className={styles.saveBtn} onClick={handleCreate} disabled={isSubmitting}>
-                {isSubmitting ? "Guardando en Prolog..." : "Guardar Caso en Prolog"}
+              <button className={styles.saveBtn} onClick={handleSave} disabled={isSubmitting}>
+                {isSubmitting ? "Guardando en Prolog..." : (editingCaseId ? "Guardar Cambios en Prolog" : "Guardar Caso en Prolog")}
               </button>
             </div>
           </div>
